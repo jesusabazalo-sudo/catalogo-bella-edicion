@@ -21,7 +21,72 @@ fetch("products.json")
     buildCategoryNav();
     renderGrid();
     renderCart();
+    renderBestsellers();
+    renderStats();
   });
+
+const BESTSELLER_IDS = [19, 22, 26, 28];
+
+function cardHTML(p) {
+  return `
+    <div class="card" data-id="${p.id}">
+      <div class="card-img-wrap" data-action="open-modal" data-id="${p.id}">
+        <div class="badges">
+          ${p.nuevo ? '<span class="badge nuevo">Nuevo</span>' : ""}
+          ${p.oferta ? '<span class="badge oferta">Oferta</span>' : ""}
+          ${p.destacado ? '<span class="badge destacado">Destacado</span>' : ""}
+        </div>
+        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+      </div>
+      <div class="card-body">
+        <span class="card-brand">${p.marca}</span>
+        <span class="card-name">${p.nombre}</span>
+        <span class="card-pres">${p.presentacion || ""}</span>
+        <div class="price-row">
+          <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
+          <span class="price-now">${CONFIG.currency}${p.precio}</span>
+        </div>
+        <span class="price-open">Abierto/sin caja: ${CONFIG.currency}${p.precio_abierto}</span>
+        <button class="add-btn" data-action="add" data-id="${p.id}">Agregar a mi lista</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderBestsellers() {
+  const wrap = document.getElementById("bestsellerGrid");
+  if (!wrap) return;
+  const items = BESTSELLER_IDS
+    .map(id => PRODUCTS.find(p => p.id === id))
+    .filter(Boolean);
+  wrap.innerHTML = items.map(cardHTML).join("");
+}
+
+function renderStats() {
+  const elProducts = document.getElementById("statProducts");
+  const elBrands = document.getElementById("statBrands");
+  if (elProducts) elProducts.textContent = `${PRODUCTS.filter(p => p.disponible !== false).length}+`;
+  if (elBrands) elBrands.textContent = new Set(PRODUCTS.map(p => p.marca)).size;
+}
+
+// ===================== MATCH GRID (categorías destacadas) =====================
+const matchGrid = document.getElementById("matchGrid");
+if (matchGrid) {
+  matchGrid.addEventListener("click", e => {
+    const btn = e.target.closest(".match-card");
+    if (!btn) return;
+    const cat = btn.dataset.cat;
+    activeCategory = cat;
+    document.querySelectorAll(".cat-pill").forEach(b => b.classList.toggle("active", b.dataset.cat === cat));
+    renderGrid();
+    document.querySelector("main").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+// ===================== PROMO BANNER =====================
+document.querySelectorAll('.promo-banner [data-action="open-modal"]').forEach(btn => {
+  btn.addEventListener("click", () => openModal(btn.dataset.id));
+});
 
 function buildCategoryNav() {
   const cats = ["Todos", ...new Set(PRODUCTS.map(p => p.categoria_web))];
@@ -72,33 +137,11 @@ function renderGrid() {
   }
   empty.hidden = true;
 
-  grid.innerHTML = list.map(p => `
-    <div class="card" data-id="${p.id}">
-      <div class="card-img-wrap" data-action="open-modal" data-id="${p.id}">
-        <div class="badges">
-          ${p.nuevo ? '<span class="badge nuevo">Nuevo</span>' : ""}
-          ${p.oferta ? '<span class="badge oferta">Oferta</span>' : ""}
-          ${p.destacado ? '<span class="badge destacado">Destacado</span>' : ""}
-        </div>
-        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-      </div>
-      <div class="card-body">
-        <span class="card-brand">${p.marca}</span>
-        <span class="card-name">${p.nombre}</span>
-        <span class="card-pres">${p.presentacion || ""}</span>
-        <div class="price-row">
-          <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
-          <span class="price-now">${CONFIG.currency}${p.precio}</span>
-        </div>
-        <span class="price-open">Abierto/sin caja: ${CONFIG.currency}${p.precio_abierto}</span>
-        <button class="add-btn" data-action="add" data-id="${p.id}">Agregar a mi lista</button>
-      </div>
-    </div>
-  `).join("");
+  grid.innerHTML = list.map(cardHTML).join("");
 }
 
 // ===================== EVENTS: grid =====================
-document.getElementById("productGrid").addEventListener("click", e => {
+function handleCardClick(e) {
   const addBtn = e.target.closest('[data-action="add"]');
   if (addBtn) {
     addToCart(addBtn.dataset.id);
@@ -109,7 +152,9 @@ document.getElementById("productGrid").addEventListener("click", e => {
   }
   const imgWrap = e.target.closest('[data-action="open-modal"]');
   if (imgWrap) openModal(imgWrap.dataset.id);
-});
+}
+document.getElementById("productGrid").addEventListener("click", handleCardClick);
+document.getElementById("bestsellerGrid").addEventListener("click", handleCardClick);
 
 document.getElementById("searchInput").addEventListener("input", e => {
   searchTerm = e.target.value;
