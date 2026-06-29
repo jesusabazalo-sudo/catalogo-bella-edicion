@@ -21,11 +21,7 @@ fetch("products.json")
     buildCategoryNav();
     renderGrid();
     renderCart();
-    renderBestsellers();
-    renderStats();
   });
-
-const BESTSELLER_IDS = [19, 22, 26, 28];
 
 function cardHTML(p) {
   return `
@@ -52,41 +48,6 @@ function cardHTML(p) {
     </div>
   `;
 }
-
-function renderBestsellers() {
-  const wrap = document.getElementById("bestsellerGrid");
-  if (!wrap) return;
-  const items = BESTSELLER_IDS
-    .map(id => PRODUCTS.find(p => p.id === id))
-    .filter(Boolean);
-  wrap.innerHTML = items.map(cardHTML).join("");
-}
-
-function renderStats() {
-  const elProducts = document.getElementById("statProducts");
-  const elBrands = document.getElementById("statBrands");
-  if (elProducts) elProducts.textContent = `${PRODUCTS.filter(p => p.disponible !== false).length}+`;
-  if (elBrands) elBrands.textContent = new Set(PRODUCTS.map(p => p.marca)).size;
-}
-
-// ===================== MATCH GRID (categorías destacadas) =====================
-const matchGrid = document.getElementById("matchGrid");
-if (matchGrid) {
-  matchGrid.addEventListener("click", e => {
-    const btn = e.target.closest(".match-card");
-    if (!btn) return;
-    const cat = btn.dataset.cat;
-    activeCategory = cat;
-    document.querySelectorAll(".cat-pill").forEach(b => b.classList.toggle("active", b.dataset.cat === cat));
-    renderGrid();
-    document.querySelector("main").scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-}
-
-// ===================== PROMO BANNER =====================
-document.querySelectorAll('.promo-banner [data-action="open-modal"]').forEach(btn => {
-  btn.addEventListener("click", () => openModal(btn.dataset.id));
-});
 
 function buildCategoryNav() {
   const cats = ["Todos", ...new Set(PRODUCTS.map(p => p.categoria_web))];
@@ -154,7 +115,6 @@ function handleCardClick(e) {
   if (imgWrap) openModal(imgWrap.dataset.id);
 }
 document.getElementById("productGrid").addEventListener("click", handleCardClick);
-document.getElementById("bestsellerGrid").addEventListener("click", handleCardClick);
 
 document.getElementById("searchInput").addEventListener("input", e => {
   searchTerm = e.target.value;
