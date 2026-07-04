@@ -1050,27 +1050,6 @@
     "disponible": true
   },
   {
-    "id": 51,
-    "nombre": "Cyzone Privé Eau de Parfum",
-    "marca": "Cyzone",
-    "categoria_web": "Perfumes mujer",
-    "categoria_original": "Perfumes y fragancias",
-    "subcategoria": "Perfume mujer",
-    "publico": "Mujer",
-    "presentacion": "30 ml",
-    "estado_empaque": "Cerrado",
-    "precio_antes": 50,
-    "precio": 40,
-    "precio_abierto": 30,
-    "descripcion": "Eau de parfum femenino Cyzone Privé en presentación compacta de 30 ml.",
-    "notas": "Nombre leído como Privé/Privilé; confirmar texto exacto. No se encontró foto de catálogo; se usa foto de la caja propia.",
-    "imagen": "images/item51.jpg",
-    "destacado": true,
-    "oferta": false,
-    "nuevo": true,
-    "disponible": true
-  },
-  {
     "id": 52,
     "nombre": "Cyzone Dancing Eau de Toilette",
     "marca": "Cyzone",
