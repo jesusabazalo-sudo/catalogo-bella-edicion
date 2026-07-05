@@ -231,27 +231,6 @@
     "disponible": true
   },
   {
-    "id": 12,
-    "nombre": "Natura Humor Frío en la Barriga",
-    "marca": "Natura",
-    "categoria_web": "Cuidado personal",
-    "categoria_original": "Cuidado personal",
-    "subcategoria": "Gel de baño / producto corporal",
-    "publico": "Unisex",
-    "presentacion": "75 ml",
-    "estado_empaque": "Cerrado",
-    "precio_antes": 45,
-    "precio": 36,
-    "precio_abierto": 26,
-    "descripcion": "Producto corporal de la línea Humor con frase divertida; ideal para regalo o detalle.",
-    "notas": "Tipo exacto por confirmar en etiqueta trasera.",
-    "imagen": "images/item12.jpg",
-    "destacado": false,
-    "oferta": false,
-    "nuevo": true,
-    "disponible": true
-  },
-  {
     "id": 13,
     "nombre": "Natura Tododia Iluminador Corporal Acerola e Hibisco",
     "marca": "Natura",
