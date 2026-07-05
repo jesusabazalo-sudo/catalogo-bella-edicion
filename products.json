@@ -1323,27 +1323,6 @@
     "disponible": true
   },
   {
-    "id": 66,
-    "nombre": "Natura Humor Me Tensiono Luego Medito",
-    "marca": "Natura",
-    "categoria_web": "Cuidado personal",
-    "categoria_original": "Cuidado personal",
-    "subcategoria": "Gel de baño / producto corporal",
-    "publico": "Unisex",
-    "presentacion": "75 g",
-    "estado_empaque": "Cerrado",
-    "precio_antes": 45,
-    "precio": 36,
-    "precio_abierto": 26,
-    "descripcion": "Producto corporal Natura Humor con frase divertida, ideal para regalo o uso personal.",
-    "notas": "Tipo exacto por confirmar.",
-    "imagen": "images/item66.jpg",
-    "destacado": false,
-    "oferta": false,
-    "nuevo": true,
-    "disponible": true
-  },
-  {
     "id": 67,
     "nombre": "Natura Kaiak Spray Pós Barba",
     "marca": "Natura",
