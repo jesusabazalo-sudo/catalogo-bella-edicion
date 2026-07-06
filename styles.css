@@ -42,72 +42,100 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; margin: 0; }
   gap: 20px;
   padding: 14px 20px;
 }
-.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
-/* --- Círculo BE --- */
+/* --- Círculo BE oscuro con dorado --- */
 .brand-mark {
-  width: 38px; height: 38px;
-  border: 1.5px solid var(--rose);
+  width: 44px; height: 44px;
+  background: #2B1418;
   border-radius: 50%;
+  border: 1.5px solid var(--gold);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Cormorant Garamond', serif;
-  font-weight: 600;
-  color: var(--rose);
-  font-size: 15px;
-  letter-spacing: 0.5px;
+  position: relative;
   flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(201,162,75,0.25), inset 0 0 10px rgba(201,162,75,0.08);
 }
-.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-mark-ring {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(201,162,75,0.35);
+}
+.brand-mark-be {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 1;
+}
 
-/* --- Nombre con brillo animado --- */
+/* --- Nombre con ola por letra --- */
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.3px;
-  background: linear-gradient(
-    90deg,
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+}
+.bl {
+  display: inline-block;
+  background: linear-gradient(90deg,
     var(--rose-dark) 0%,
-    var(--rose-dark) 25%,
+    var(--rose-dark) 20%,
     #F5D78E 45%,
-    #fff8e1 50%,
+    #fffaf0 50%,
     #F5D78E 55%,
-    var(--rose-dark) 75%,
+    var(--rose-dark) 80%,
     var(--rose-dark) 100%
   );
-  background-size: 300% 100%;
-  background-position: 150% 0;
+  background-size: 400% 100%;
+  background-position: 200% 0;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: brandShine 4s ease-in-out infinite;
-  position: relative;
+  animation:
+    blWave  3.5s ease-in-out infinite,
+    blShine 5s   ease-in-out infinite;
+  animation-delay:
+    calc(var(--i) * 0.07s),
+    calc(var(--i) * 0.05s);
 }
-.brand-name::after {
-  content: '✦';
-  position: absolute;
-  right: -14px;
-  top: 50%;
-  transform: translateY(-50%) scale(0);
-  font-size: 10px;
+.brand-space { width: 6px; }
+@keyframes blWave {
+  0%,100% { transform: translateY(0)    rotate(0deg); }
+  20%      { transform: translateY(-2px) rotate(-0.6deg); }
+  50%      { transform: translateY(1.5px) rotate(0.4deg); }
+  75%      { transform: translateY(-1px) rotate(-0.2deg); }
+}
+@keyframes blShine {
+  0%, 25%      { background-position: 200% 0; }
+  60%          { background-position: -100% 0; }
+  75%, 100%    { background-position: -100% 0; }
+}
+.brand-spark {
+  font-size: 9px;
   color: var(--gold);
   -webkit-text-fill-color: var(--gold);
-  animation: brandSpark 4s ease-in-out infinite;
-  pointer-events: none;
+  margin-left: 3px;
+  opacity: 0;
+  transform: scale(0);
+  display: inline-block;
+  animation: sparkPop 5s ease-in-out infinite;
+  animation-delay: 0.8s;
 }
-@keyframes brandShine {
-  0%    { background-position: 150% 0; }
-  45%   { background-position: -50% 0; }
-  55%, 100% { background-position: -50% 0; }
-}
-@keyframes brandSpark {
-  0%, 43%  { transform: translateY(-50%) scale(0); opacity: 0; }
-  50%      { transform: translateY(-50%) scale(1.4); opacity: 1; }
-  58%      { transform: translateY(-50%) scale(0.8); opacity: 0.7; }
-  65%, 100%{ transform: translateY(-50%) scale(0); opacity: 0; }
+@keyframes sparkPop {
+  0%, 54%  { opacity: 0; transform: scale(0); }
+  60%      { opacity: 1; transform: scale(1.6); }
+  68%      { opacity: 0.6; transform: scale(0.9); }
+  75%,100% { opacity: 0; transform: scale(0); }
 }
 
-.brand-sub { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); }
+.brand-sub { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); }
 
 .search-wrap { flex: 1; max-width: 420px; margin-left: auto; }
 .search-wrap input {
