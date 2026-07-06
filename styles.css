@@ -43,7 +43,71 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; margin: 0; }
   padding: 14px 20px;
 }
 .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.brand-logo { height: 48px; width: auto; display: block; }
+
+/* --- Círculo BE --- */
+.brand-mark {
+  width: 38px; height: 38px;
+  border: 1.5px solid var(--rose);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  color: var(--rose);
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+
+/* --- Nombre con brillo animado --- */
+.brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  background: linear-gradient(
+    90deg,
+    var(--rose-dark) 0%,
+    var(--rose-dark) 25%,
+    #F5D78E 45%,
+    #fff8e1 50%,
+    #F5D78E 55%,
+    var(--rose-dark) 75%,
+    var(--rose-dark) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 150% 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: brandShine 4s ease-in-out infinite;
+  position: relative;
+}
+.brand-name::after {
+  content: '✦';
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  font-size: 10px;
+  color: var(--gold);
+  -webkit-text-fill-color: var(--gold);
+  animation: brandSpark 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes brandShine {
+  0%    { background-position: 150% 0; }
+  45%   { background-position: -50% 0; }
+  55%, 100% { background-position: -50% 0; }
+}
+@keyframes brandSpark {
+  0%, 43%  { transform: translateY(-50%) scale(0); opacity: 0; }
+  50%      { transform: translateY(-50%) scale(1.4); opacity: 1; }
+  58%      { transform: translateY(-50%) scale(0.8); opacity: 0.7; }
+  65%, 100%{ transform: translateY(-50%) scale(0); opacity: 0; }
+}
+
+.brand-sub { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); }
 
 .search-wrap { flex: 1; max-width: 420px; margin-left: auto; }
 .search-wrap input {
