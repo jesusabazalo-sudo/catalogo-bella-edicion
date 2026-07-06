@@ -221,9 +221,9 @@
 <canvas id="mandalaCanvas"></canvas>
 <script>
 (function(){
-  const c = document.createElement('style');
-  c.textContent = '#mandalaCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}';
-  document.head.appendChild(c);
+  const cs = document.createElement('style');
+  cs.textContent = '#mandalaCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:0.55;}';
+  document.head.appendChild(cs);
 
   const cv = document.getElementById('mandalaCanvas');
   const cx = cv.getContext('2d');
@@ -232,115 +232,145 @@
   function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
-  window.addEventListener('scroll', () => { scrollY = window.pageYOffset; }, {passive:true});
+  window.addEventListener('scroll', ()=>{ scrollY = window.pageYOffset; },{passive:true});
 
-  // Posiciones absolutas de mandalas en la página (Y en px desde top)
-  const NODES = [
-    { ax: 0.07, ay:  350, r: 155, spd:  0.00018, phase: 0 },
-    { ax: 0.93, ay:  350, r: 120, spd: -0.00014, phase: 1.2 },
-    { ax: 0.05, ay: 1100, r: 140, spd:  0.00022, phase: 2.5 },
-    { ax: 0.95, ay: 1100, r: 110, spd: -0.00019, phase: 0.7 },
-    { ax: 0.07, ay: 1900, r: 160, spd:  0.00016, phase: 3.1 },
-    { ax: 0.93, ay: 1900, r: 125, spd: -0.00021, phase: 1.8 },
-    { ax: 0.05, ay: 2700, r: 145, spd:  0.00020, phase: 4.0 },
-    { ax: 0.95, ay: 2700, r: 115, spd: -0.00017, phase: 2.2 },
-    { ax: 0.07, ay: 3500, r: 155, spd:  0.00019, phase: 0.5 },
-    { ax: 0.93, ay: 3500, r: 130, spd: -0.00023, phase: 3.7 },
-  ];
+  // Grid completo cubriendo toda la página: 3 columnas × 8 filas
+  const COLS = [0.10, 0.50, 0.90];
+  const ROW_H = 650;
+  const ROWS = 9;
+  const NODES = [];
+  COLS.forEach((ax, ci) => {
+    for (let ri = 0; ri < ROWS; ri++) {
+      const isCenter = ci === 1;
+      NODES.push({
+        ax,
+        ay: ri * ROW_H + (ci === 1 ? ROW_H * 0.5 : 0) + 180,
+        r: isCenter ? 230 : 160,
+        spd: (ci % 2 === 0 ? 1 : -1) * (0.00012 + ci * 0.00004 + ri * 0.000015),
+        phase: ci * 2.1 + ri * 0.9,
+        dotPhase: ci * 1.3 + ri * 0.5
+      });
+    }
+  });
 
-  function flowerOfLife(x, y, r, angle, alpha) {
+  function mandala(x, y, r, t, node) {
+    const a1 =  t * node.spd + node.phase;          // exterior CW
+    const a2 = -t * node.spd * 0.65 + node.phase;   // interior CCW
+    const a3 =  Math.sin(t * 0.00035 + node.phase) * 0.28; // péndulo medio
+
+    const dark = 'rgba(14,5,10,';
     const n = 6;
-    const dark = `rgba(18,8,12,${alpha})`;
-    const rose = `rgba(140,47,69,${alpha * 0.9})`;
 
-    // Círculos concéntricos externos
-    for (let i = 1; i <= 4; i++) {
+    // 1. Círculos concéntricos (5 anillos)
+    for (let i = 1; i <= 5; i++) {
       cx.beginPath();
-      cx.arc(x, y, r * i / 4, 0, Math.PI*2);
-      cx.strokeStyle = dark;
+      cx.arc(x, y, r * i / 5, 0, Math.PI*2);
+      cx.strokeStyle = dark + (0.55 - i*0.06) + ')';
+      cx.lineWidth = 0.35;
+      cx.stroke();
+    }
+
+    // 2. Flor de la vida — pétalos interiores (capa a2)
+    for (let i = 0; i < n; i++) {
+      const a = a2 + (i/n)*Math.PI*2;
+      const bx = x + Math.cos(a)*r*0.5, by = y + Math.sin(a)*r*0.5;
+      cx.beginPath();
+      cx.arc(bx, by, r*0.5, 0, Math.PI*2);
+      cx.strokeStyle = dark + '0.45)';
       cx.lineWidth = 0.3;
       cx.stroke();
     }
 
-    // Pétalo central — flor de la vida
+    // 3. Flor exterior — anillo 2 (capa a1)
     for (let i = 0; i < n; i++) {
-      const a = angle + (i / n) * Math.PI * 2;
-      const bx = x + Math.cos(a) * r * 0.5;
-      const by = y + Math.sin(a) * r * 0.5;
+      const a = a1 + (i/n)*Math.PI*2;
+      const bx = x + Math.cos(a)*r, by = y + Math.sin(a)*r;
       cx.beginPath();
-      cx.arc(bx, by, r * 0.5, 0, Math.PI*2);
-      cx.strokeStyle = dark;
-      cx.lineWidth = 0.25;
+      cx.arc(bx, by, r*0.5, 0, Math.PI*2);
+      cx.strokeStyle = dark + '0.25)';
+      cx.lineWidth = 0.22;
       cx.stroke();
-
-      // Segundo anillo de pétalos
-      const bx2 = x + Math.cos(a) * r;
-      const by2 = y + Math.sin(a) * r;
-      cx.beginPath();
-      cx.arc(bx2, by2, r * 0.5, 0, Math.PI*2);
-      cx.strokeStyle = `rgba(18,8,12,${alpha * 0.4})`;
-      cx.lineWidth = 0.2;
-      cx.stroke();
-
-      // Dot rojo en intersección exterior
-      cx.beginPath();
-      cx.arc(bx2, by2, 1.8, 0, Math.PI*2);
-      cx.fillStyle = `rgba(140,47,69,${alpha * 0.8})`;
-      cx.fill();
     }
 
-    // Estrella de 12 puntas (merkaba doble)
+    // 4. Hexágono interior (a2)
+    cx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const a = a2 + (i/n)*Math.PI*2;
+      const px = x + Math.cos(a)*r*0.5, py = y + Math.sin(a)*r*0.5;
+      i===0 ? cx.moveTo(px,py) : cx.lineTo(px,py);
+    }
+    cx.closePath();
+    cx.strokeStyle = dark + '0.5)';
+    cx.lineWidth = 0.35;
+    cx.stroke();
+
+    // 5. Merkaba doble — dos triángulos entrelazados (a3 péndulo)
     for (let tri = 0; tri < 2; tri++) {
       cx.beginPath();
       for (let i = 0; i <= 3; i++) {
-        const a = angle + (tri * Math.PI/6) + (i/3) * Math.PI*2;
-        const px = x + Math.cos(a) * r * 0.85;
-        const py = y + Math.sin(a) * r * 0.85;
-        if (i === 0) cx.moveTo(px, py); else cx.lineTo(px, py);
+        const a = a3 + (tri * Math.PI/3) + (i/3)*Math.PI*2;
+        const px = x + Math.cos(a)*r*0.88, py = y + Math.sin(a)*r*0.88;
+        i===0 ? cx.moveTo(px,py) : cx.lineTo(px,py);
       }
       cx.closePath();
-      cx.strokeStyle = `rgba(18,8,12,${alpha * 0.55})`;
-      cx.lineWidth = 0.3;
+      cx.strokeStyle = dark + '0.42)';
+      cx.lineWidth = 0.35;
       cx.stroke();
     }
 
-    // Líneas radiales de 12 (Cubo de Metatrón)
+    // 6. Cubo de Metatrón — 12 líneas desde centro (a1)
     for (let i = 0; i < 12; i++) {
-      const a = angle + (i/12) * Math.PI*2;
+      const a = a1 + (i/12)*Math.PI*2;
       cx.beginPath();
       cx.moveTo(x, y);
       cx.lineTo(x + Math.cos(a)*r, y + Math.sin(a)*r);
-      cx.strokeStyle = `rgba(18,8,12,${alpha * 0.3})`;
-      cx.lineWidth = 0.2;
+      cx.strokeStyle = dark + '0.22)';
+      cx.lineWidth = 0.22;
       cx.stroke();
+    }
 
-      // Dot en el contorno exterior
-      if (i % 2 === 0) {
-        cx.beginPath();
-        cx.arc(x + Math.cos(a)*r*0.75, y + Math.sin(a)*r*0.75, 1.2, 0, Math.PI*2);
-        cx.fillStyle = rose;
-        cx.fill();
+    // 7. Estrella de 12 puntas externa (a1)
+    for (let s = 0; s < 2; s++) {
+      cx.beginPath();
+      for (let i = 0; i <= 6; i++) {
+        const a = a1 + (s * Math.PI/6) + (i/6)*Math.PI*2;
+        const px = x + Math.cos(a)*r*0.95, py = y + Math.sin(a)*r*0.95;
+        i===0 ? cx.moveTo(px,py) : cx.lineTo(px,py);
       }
+      cx.closePath();
+      cx.strokeStyle = dark + '0.3)';
+      cx.lineWidth = 0.28;
+      cx.stroke();
     }
 
-    // Conector entre pétalos (anillo interno hexagonal)
-    cx.beginPath();
-    for (let i = 0; i <= n; i++) {
-      const a = angle + (i/n)*Math.PI*2;
-      const px = x + Math.cos(a)*r*0.5;
-      const py = y + Math.sin(a)*r*0.5;
-      if (i===0) cx.moveTo(px,py); else cx.lineTo(px,py);
+    // 8. Puntos rojos PARPADEANTES en nodos clave
+    const dotPositions = [];
+    // En anillo medio (r*0.75)
+    for (let i = 0; i < 12; i++) {
+      const a = a1 + (i/12)*Math.PI*2;
+      dotPositions.push({ x: x + Math.cos(a)*r*0.75, y: y + Math.sin(a)*r*0.75, size: 1.8, f: 0.04 + i*0.007 });
     }
-    cx.closePath();
-    cx.strokeStyle = `rgba(18,8,12,${alpha * 0.5})`;
-    cx.lineWidth = 0.3;
-    cx.stroke();
+    // En pétalos exteriores
+    for (let i = 0; i < n; i++) {
+      const a = a1 + (i/n)*Math.PI*2;
+      dotPositions.push({ x: x + Math.cos(a)*r, y: y + Math.sin(a)*r, size: 2.2, f: 0.03 + i*0.009 });
+    }
+    // En pétalos interiores
+    for (let i = 0; i < n; i++) {
+      const a = a2 + (i/n)*Math.PI*2;
+      dotPositions.push({ x: x + Math.cos(a)*r*0.5, y: y + Math.sin(a)*r*0.5, size: 1.4, f: 0.05 + i*0.006 });
+    }
+    // Centro
+    dotPositions.push({ x, y, size: 3, f: 0.025 });
 
-    // Dot central
-    cx.beginPath();
-    cx.arc(x, y, 2.5, 0, Math.PI*2);
-    cx.fillStyle = `rgba(140,47,69,${alpha})`;
-    cx.fill();
+    dotPositions.forEach((d, di) => {
+      const pulse = 0.5 + 0.5 * Math.sin(t * d.f + node.dotPhase + di * 0.4);
+      const da = 0.3 + pulse * 0.7;
+      cx.beginPath();
+      cx.arc(d.x, d.y, d.size * (0.7 + pulse * 0.5), 0, Math.PI*2);
+      cx.fillStyle = `rgba(180,30,55,${da})`;
+      cx.fill();
+    });
   }
 
   function draw(){
@@ -348,22 +378,20 @@
     cx.clearRect(0, 0, W, H);
 
     NODES.forEach(node => {
-      const screenY = node.ay - scrollY;
-      // Solo dibujar si está cerca del viewport (con margen)
-      if (screenY < -node.r * 1.5 || screenY > H + node.r * 1.5) return;
+      const sy = node.ay - scrollY;
+      if (sy < -node.r*1.8 || sy > H + node.r*1.8) return;
+      const sx = W * node.ax;
 
-      const screenX = W * node.ax;
-      const angle   = t * node.spd + node.phase;
+      // Fade suave en bordes del viewport
+      const mg = node.r * 1.3;
+      let alpha = 1;
+      if (sy < mg)     alpha *= Math.max(0, sy / mg);
+      if (sy > H - mg) alpha *= Math.max(0, (H - sy) / mg);
 
-      // Fade in/out suave según qué tan cerca está del borde
-      const margin = node.r * 1.2;
-      let alpha = 0.55;
-      if (screenY < margin)        alpha *= Math.max(0, screenY / margin);
-      if (screenY > H - margin)    alpha *= Math.max(0, (H - screenY) / margin);
-
-      flowerOfLife(screenX, screenY, node.r, angle, alpha);
+      cx.globalAlpha = alpha;
+      mandala(sx, sy, node.r, t, node);
     });
-
+    cx.globalAlpha = 1;
     requestAnimationFrame(draw);
   }
 
