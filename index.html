@@ -334,17 +334,150 @@
 <script>
 (function(){
   const cs = document.createElement('style');
-  cs.textContent = '#mandalaCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:0.55;}';
+  cs.textContent = '#mandalaCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:0.48;}';
   document.head.appendChild(cs);
-
   const cv = document.getElementById('mandalaCanvas');
   const cx = cv.getContext('2d');
-  let W, H, scrollY = 0, t = 0;
-
-  function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+  let W, SH, scrollY = 0, t = 0;
+  function resize(){ W = cv.width = window.innerWidth; SH = cv.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
-  window.addEventListener('scroll', ()=>{ scrollY = window.pageYOffset; },{passive:true});
+  window.addEventListener('scroll', ()=>{ scrollY = window.pageYOffset; }, {passive:true});
+
+  // Red hexagonal que cubre toda la página
+  const GX = 185, GY = 160;
+  let COLS, ROWS, nodes;
+
+  function buildGrid(){
+    COLS = Math.ceil(W / GX) + 3;
+    ROWS = 50;
+    nodes = [];
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        nodes.push({
+          c, r,
+          nr: GX * 0.27,            // radio nodo
+          ph: c*0.71 + r*1.23,      // fase propia
+          spd: 0.000085 + (c*r%11)*0.000012,
+          dir: (c+r)%2===0 ? 1:-1,
+          dp: c*0.55 + r*0.88       // fase de parpadeo
+        });
+      }
+    }
+  }
+  buildGrid();
+  window.addEventListener('resize', buildGrid);
+
+  // Posición pantalla de un nodo
+  function nPos(n){
+    const totalW = (COLS-1)*GX;
+    const sx = (W-totalW)/2 + n.c*GX + (n.r%2)*GX*0.5;
+    const sy = n.r*GY + 90 - scrollY;
+    return {x:sx, y:sy};
+  }
+
+  // Vecinos hexagonales
+  function nbrs(n){
+    const odds = n.r%2;
+    return [
+      [0,-1],[1,-1+(odds?1:0)],
+      [-1,0],[1,0],
+      [0,1],[1,1-(odds?0:1)]
+    ].map(([dc,dr])=>{
+      const nc=n.c+dc, nr=n.r+dr;
+      return (nc>=0&&nc<COLS&&nr>=0&&nr<ROWS) ? nodes[nr*COLS+nc] : null;
+    }).filter(Boolean);
+  }
+
+  function drawNode(n, sx, sy){
+    const r = n.nr;
+    const a1 =  t * n.spd * n.dir + n.ph;
+    const a2 = -t * n.spd * 0.6   + n.ph;
+    const d  = 'rgba(10,4,8,';
+
+    // Círculo exterior
+    cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
+    cx.strokeStyle=d+'0.5)'; cx.lineWidth=0.4; cx.stroke();
+    // Círculo interior
+    cx.beginPath(); cx.arc(sx,sy,r*0.5,0,Math.PI*2);
+    cx.strokeStyle=d+'0.35)'; cx.lineWidth=0.28; cx.stroke();
+
+    // Pétalos flor (6 círculos a media distancia)
+    for(let i=0;i<6;i++){
+      const a=a2+(i/6)*Math.PI*2;
+      cx.beginPath(); cx.arc(sx+Math.cos(a)*r*0.5, sy+Math.sin(a)*r*0.5, r*0.5, 0, Math.PI*2);
+      cx.strokeStyle=d+'0.22)'; cx.lineWidth=0.22; cx.stroke();
+    }
+
+    // Merkaba (dos triángulos)
+    for(let tri=0;tri<2;tri++){
+      cx.beginPath();
+      for(let i=0;i<=3;i++){
+        const a=a1+(tri*Math.PI/3)+(i/3)*Math.PI*2;
+        const px=sx+Math.cos(a)*r*0.85, py=sy+Math.sin(a)*r*0.85;
+        i===0?cx.moveTo(px,py):cx.lineTo(px,py);
+      }
+      cx.closePath(); cx.strokeStyle=d+'0.32)'; cx.lineWidth=0.3; cx.stroke();
+    }
+
+    // 12 líneas radiales (Metatrón)
+    for(let i=0;i<12;i++){
+      const a=a1+(i/12)*Math.PI*2;
+      cx.beginPath(); cx.moveTo(sx,sy); cx.lineTo(sx+Math.cos(a)*r, sy+Math.sin(a)*r);
+      cx.strokeStyle=d+'0.15)'; cx.lineWidth=0.2; cx.stroke();
+    }
+
+    // Puntos rojos parpadeantes en nodos del hexágono
+    for(let i=0;i<6;i++){
+      const a=a1+(i/6)*Math.PI*2;
+      const px=sx+Math.cos(a)*r, py=sy+Math.sin(a)*r;
+      const pulse=0.35+0.65*Math.abs(Math.sin(t*0.038+n.dp+i*0.7));
+      cx.beginPath(); cx.arc(px,py,1.6,0,Math.PI*2);
+      cx.fillStyle=`rgba(185,28,50,${pulse})`; cx.fill();
+    }
+    // Punto central
+    const pc=0.4+0.6*Math.abs(Math.sin(t*0.025+n.dp));
+    cx.beginPath(); cx.arc(sx,sy,2.2,0,Math.PI*2);
+    cx.fillStyle=`rgba(185,28,50,${pc})`; cx.fill();
+  }
+
+  function draw(){
+    t++;
+    cx.clearRect(0,0,W,SH);
+
+    // Aristas de conexión entre vecinos (dibujadas primero, detrás)
+    const seen = new Set();
+    nodes.forEach(n=>{
+      const p = nPos(n);
+      if(p.y < -n.nr*2 || p.y > SH+n.nr*2) return;
+      nbrs(n).forEach(nb=>{
+        const key = Math.min(n.r*1e3+n.c, nb.r*1e3+nb.c)+'_'+Math.max(n.r*1e3+n.c, nb.r*1e3+nb.c);
+        if(seen.has(key)) return; seen.add(key);
+        const p2 = nPos(nb);
+        cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(p2.x,p2.y);
+        cx.strokeStyle='rgba(10,4,8,0.14)'; cx.lineWidth=0.32; cx.stroke();
+      });
+    });
+
+    // Nodos
+    nodes.forEach(n=>{
+      const p = nPos(n);
+      if(p.y < -n.nr*2.5 || p.y > SH+n.nr*2.5) return;
+      const mg=80;
+      let ga=1;
+      if(p.y<mg) ga=Math.max(0,p.y/mg);
+      if(p.y>SH-mg) ga=Math.max(0,(SH-p.y)/mg);
+      cx.globalAlpha=ga;
+      drawNode(n, p.x, p.y);
+    });
+    cx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<canvas id="snowCanvas"></canvas>
 
   // Grid completo cubriendo toda la página: 3 columnas × 8 filas
   const COLS = [0.10, 0.50, 0.90];
@@ -637,6 +770,233 @@
   }
 
   requestAnimationFrame(draw);
+})();
+</script>
+
+<!-- 🐶 PERRITO ANIMADO -->
+<script>
+(function(){
+  const dc = document.createElement('canvas');
+  dc.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:500;';
+  document.body.appendChild(dc);
+  const ctx = dc.getContext('2d');
+  let W = dc.width = window.innerWidth;
+  let H = dc.height = window.innerHeight;
+  window.addEventListener('resize', ()=>{ W = dc.width = window.innerWidth; H = dc.height = window.innerHeight; });
+
+  const FUR='#9B6B3A', FD='#7A4E28', FL='#C8906A', EYE='#1A0A0A';
+
+  const D = {
+    x:180, y:0, vx:1.8, vy:0,
+    dir:1, fr:0, st:'run', stT:0, stDur:180,
+    zz:[], bkPh:0, ground:0,
+
+    setState(s, dur){
+      this.st=s; this.stT=0;
+      this.stDur = dur||(80+Math.random()*180);
+      if(s==='sleep') this.stDur=280+Math.random()*320;
+      if(s==='bark'){ this.stDur=50+Math.random()*60; this.bkPh=0; }
+    },
+
+    next(){
+      const r=Math.random(), s=this.st;
+      if(s==='run'){
+        if(r<0.35) this.setState('run');
+        else if(r<0.55) this.setState('sit');
+        else if(r<0.68) this.setState('sniff');
+        else if(r<0.80) this.setState('bark');
+        else { this.setState('look_up'); }
+      } else if(s==='sit'){
+        if(r<0.45){ this.setState('run'); this.dir*=-1; }
+        else if(r<0.68) this.setState('run');
+        else if(r<0.82) this.setState('sleep');
+        else this.setState('bark');
+      } else if(s==='sleep'){
+        this.setState('sit');
+      } else if(s==='bark'){
+        r<0.6 ? this.setState('run') : this.setState('sit');
+      } else if(s==='sniff'){
+        r<0.65 ? this.setState('run') : this.setState('sit');
+      } else if(s==='look_up'){
+        if(r<0.4) this.setState('bark');
+        else if(r<0.7) this.setState('excited');
+        else this.setState('run');
+      } else if(s==='excited'){
+        this.setState('run');
+      } else {
+        this.setState('run');
+      }
+    },
+
+    update(){
+      this.fr++; this.stT++;
+      this.ground = H - 145;
+
+      if(this.stT >= this.stDur) this.next();
+
+      // Reacción aleatoria a copos
+      if((this.st==='run'||this.st==='sit') && Math.random()<0.0035)
+        this.setState('look_up', 90);
+
+      switch(this.st){
+        case 'run':
+          this.vx = this.dir*(1.7 + Math.sin(this.fr*0.09)*0.4);
+          this.x += this.vx; break;
+        case 'sniff':
+          this.vx = this.dir*0.55; this.x += this.vx; break;
+        case 'excited':
+          this.vy = Math.sin(this.fr*0.35)*3.5; break;
+        case 'bark': this.bkPh=this.stT; break;
+      }
+
+      // Bordes pantalla
+      if(this.x>W-70){ this.dir=-1; this.x=W-70; }
+      if(this.x<70){ this.dir=1; this.x=70; }
+
+      // Gravedad
+      if(this.y < this.ground){ this.vy += 0.35; this.y += this.vy; }
+      else{ this.y = this.ground; this.vy=0; }
+
+      // ZZZ al dormir
+      if(this.st==='sleep' && this.fr%85===0)
+        this.zz.push({x:this.x+this.dir*18, y:this.y-38, a:1, s:9, vy:-0.38});
+      this.zz = this.zz.filter(z=>{ z.y+=z.vy; z.a-=0.007; z.s+=0.025; return z.a>0; });
+    },
+
+    draw(){
+      const fr=this.fr, s=this.st;
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      if(this.dir<0) ctx.scale(-1,1);
+
+      if(s==='sleep') this._sleep();
+      else if(s==='sit') this._sit(fr);
+      else this._run(fr, s);
+
+      ctx.restore();
+
+      // ZZZ fuera del save/restore (posición absoluta)
+      this.zz.forEach(z=>{
+        ctx.save(); ctx.globalAlpha=z.a;
+        ctx.font=`bold ${z.s}px Georgia`; ctx.fillStyle='#8888BB';
+        // Ajustar dirección para que salga del lado correcto
+        ctx.fillText('z', z.x * (this.dir<0 ? 1 : 1), z.y);
+        ctx.restore();
+      });
+    },
+
+    _tail(fr){
+      const wag=Math.sin(fr*0.22)*22;
+      ctx.beginPath(); ctx.moveTo(17,-3);
+      ctx.quadraticCurveTo(22,-12+wag*0.4,28,wag);
+      ctx.strokeStyle=FD; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
+    },
+
+    _head(barkOpen, tilt){
+      ctx.save();
+      if(tilt) ctx.rotate(tilt);
+      // Cabeza
+      ctx.beginPath(); ctx.arc(-20,-10,9,0,Math.PI*2);
+      ctx.fillStyle=FL; ctx.fill();
+      // Oreja caída
+      ctx.beginPath(); ctx.ellipse(-17,-20,4,8,-0.15,0,Math.PI*2);
+      ctx.fillStyle=FD; ctx.fill();
+      // Hocico
+      ctx.beginPath(); ctx.ellipse(-29,-8,6.5,4.5,0,0,Math.PI*2);
+      ctx.fillStyle=FL; ctx.fill();
+      // Boca
+      if(barkOpen>0){
+        ctx.beginPath(); ctx.moveTo(-25,-5); ctx.lineTo(-32,-5);
+        ctx.lineTo(-32,-5+barkOpen); ctx.lineTo(-25,-5+barkOpen);
+        ctx.fillStyle='#BB3333'; ctx.fill();
+      }
+      // Nariz
+      ctx.beginPath(); ctx.ellipse(-33,-8,2.5,2,0,0,Math.PI*2);
+      ctx.fillStyle=EYE; ctx.fill();
+      // Ojo
+      ctx.beginPath(); ctx.arc(-24,-13,2.2,0,Math.PI*2);
+      ctx.fillStyle=EYE; ctx.fill();
+      ctx.beginPath(); ctx.arc(-23.4,-13.8,0.8,0,Math.PI*2);
+      ctx.fillStyle='white'; ctx.fill();
+      ctx.restore();
+    },
+
+    _leg(xo, ang, col){
+      ctx.save(); ctx.translate(xo,6); ctx.rotate(ang*Math.PI/180);
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,13);
+      ctx.strokeStyle=col; ctx.lineWidth=5; ctx.lineCap='round'; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0,13,3,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.fill(); ctx.restore();
+    },
+
+    _run(fr, s){
+      const ls=Math.sin(fr*0.22)*13;
+      const sniff=s==='sniff'?9:0;
+      const bk=s==='bark'?Math.abs(Math.sin(fr*0.32))*4.5:0;
+      const ex=s==='excited'?Math.sin(fr*0.38)*4:0;
+      const lu=s==='look_up'?-8:0;
+      ctx.translate(0,ex);
+      // Patas traseras
+      this._leg(5, ls*0.9, FD); this._leg(12,-ls*0.9,FD);
+      // Cuerpo
+      ctx.beginPath(); ctx.ellipse(-1,0,20,10,0,0,Math.PI*2);
+      ctx.fillStyle=FUR; ctx.fill();
+      // Cola
+      this._tail(fr);
+      // Patas delanteras
+      this._leg(-10,-ls,FUR); this._leg(-3,ls,FUR);
+      // Cabeza
+      ctx.translate(0,sniff+lu);
+      this._head(bk, s==='look_up'?0.25:0);
+    },
+
+    _sit(fr){
+      this._tail(fr);
+      ctx.save(); ctx.rotate(-0.18);
+      ctx.beginPath(); ctx.ellipse(0,0,16,11,0,0,Math.PI*2);
+      ctx.fillStyle=FUR; ctx.fill(); ctx.restore();
+      ctx.beginPath();
+      ctx.moveTo(-8,6); ctx.lineTo(-13,19); ctx.lineTo(-4,19);
+      ctx.moveTo(5,6); ctx.lineTo(2,19); ctx.lineTo(10,19);
+      ctx.strokeStyle=FUR; ctx.lineWidth=5; ctx.lineCap='round'; ctx.stroke();
+      ctx.save(); ctx.translate(-14,-18);
+      const tilt=Math.sin(fr*0.028)*0.18;
+      this._head(0,tilt); ctx.restore();
+    },
+
+    _sleep(){
+      ctx.save(); ctx.rotate(0.18);
+      ctx.beginPath(); ctx.ellipse(0,5,23,9,0,0,Math.PI*2);
+      ctx.fillStyle=FUR; ctx.fill(); ctx.restore();
+      ctx.save(); ctx.translate(-18,5); ctx.rotate(0.4);
+      ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2);
+      ctx.fillStyle=FL; ctx.fill();
+      ctx.beginPath(); ctx.ellipse(2,-13,4,7,0.2,0,Math.PI*2);
+      ctx.fillStyle=FD; ctx.fill();
+      // Ojo cerrado
+      ctx.beginPath(); ctx.moveTo(-3,-2); ctx.lineTo(3,-2);
+      ctx.strokeStyle=EYE; ctx.lineWidth=1.6; ctx.stroke();
+      ctx.restore();
+      ctx.beginPath(); ctx.moveTo(-4,10); ctx.lineTo(-14,16);
+      ctx.moveTo(5,10); ctx.lineTo(14,16);
+      ctx.strokeStyle=FD; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
+    }
+  };
+
+  // Reacciones a acciones del usuario
+  setTimeout(()=>{
+    const cart=document.getElementById('openCartBtn');
+    if(cart) cart.addEventListener('click',()=>D.setState('bark',70));
+    const srch=document.getElementById('searchInput');
+    if(srch) srch.addEventListener('input',()=>{ if(D.st==='run'||D.st==='sit') D.setState('look_up',100); });
+  }, 3500);
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    D.update(); D.draw();
+    requestAnimationFrame(loop);
+  }
+  loop();
 })();
 </script>
 </body>
