@@ -112,10 +112,13 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <div class="brand">
-      <span class="brand-mark">BE</span>
+  <div class="brand">
+      <div class="brand-mark">
+        <div class="brand-mark-ring"></div>
+        <span class="brand-mark-be">BE</span>
+      </div>
       <div class="brand-text">
-        <span class="brand-name">Bella Edición</span>
+        <span class="brand-name" aria-label="Bella Edición"><span class="bl" style="--i:0">B</span><span class="bl" style="--i:1">e</span><span class="bl" style="--i:2">l</span><span class="bl" style="--i:3">l</span><span class="bl" style="--i:4">a</span><span class="bl brand-space" style="--i:5">&nbsp;</span><span class="bl" style="--i:6">E</span><span class="bl" style="--i:7">d</span><span class="bl" style="--i:8">i</span><span class="bl" style="--i:9">c</span><span class="bl" style="--i:10">i</span><span class="bl" style="--i:11">ó</span><span class="bl" style="--i:12">n</span><span class="brand-spark">✦</span></span>
         <span class="brand-sub">Perfumería &amp; Belleza</span>
       </div>
     </div>
@@ -212,6 +215,159 @@
     main.classList.add('visible');
     setTimeout(function(){ intro.remove(); }, 900);
   }, 2800);
+})();
+</script>
+
+<canvas id="mandalaCanvas"></canvas>
+<script>
+(function(){
+  const c = document.createElement('style');
+  c.textContent = '#mandalaCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}';
+  document.head.appendChild(c);
+
+  const cv = document.getElementById('mandalaCanvas');
+  const cx = cv.getContext('2d');
+  let W, H, scrollY = 0, t = 0;
+
+  function resize(){ W = cv.width = window.innerWidth; H = cv.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('scroll', () => { scrollY = window.pageYOffset; }, {passive:true});
+
+  // Posiciones absolutas de mandalas en la página (Y en px desde top)
+  const NODES = [
+    { ax: 0.07, ay:  350, r: 155, spd:  0.00018, phase: 0 },
+    { ax: 0.93, ay:  350, r: 120, spd: -0.00014, phase: 1.2 },
+    { ax: 0.05, ay: 1100, r: 140, spd:  0.00022, phase: 2.5 },
+    { ax: 0.95, ay: 1100, r: 110, spd: -0.00019, phase: 0.7 },
+    { ax: 0.07, ay: 1900, r: 160, spd:  0.00016, phase: 3.1 },
+    { ax: 0.93, ay: 1900, r: 125, spd: -0.00021, phase: 1.8 },
+    { ax: 0.05, ay: 2700, r: 145, spd:  0.00020, phase: 4.0 },
+    { ax: 0.95, ay: 2700, r: 115, spd: -0.00017, phase: 2.2 },
+    { ax: 0.07, ay: 3500, r: 155, spd:  0.00019, phase: 0.5 },
+    { ax: 0.93, ay: 3500, r: 130, spd: -0.00023, phase: 3.7 },
+  ];
+
+  function flowerOfLife(x, y, r, angle, alpha) {
+    const n = 6;
+    const dark = `rgba(18,8,12,${alpha})`;
+    const rose = `rgba(140,47,69,${alpha * 0.9})`;
+
+    // Círculos concéntricos externos
+    for (let i = 1; i <= 4; i++) {
+      cx.beginPath();
+      cx.arc(x, y, r * i / 4, 0, Math.PI*2);
+      cx.strokeStyle = dark;
+      cx.lineWidth = 0.3;
+      cx.stroke();
+    }
+
+    // Pétalo central — flor de la vida
+    for (let i = 0; i < n; i++) {
+      const a = angle + (i / n) * Math.PI * 2;
+      const bx = x + Math.cos(a) * r * 0.5;
+      const by = y + Math.sin(a) * r * 0.5;
+      cx.beginPath();
+      cx.arc(bx, by, r * 0.5, 0, Math.PI*2);
+      cx.strokeStyle = dark;
+      cx.lineWidth = 0.25;
+      cx.stroke();
+
+      // Segundo anillo de pétalos
+      const bx2 = x + Math.cos(a) * r;
+      const by2 = y + Math.sin(a) * r;
+      cx.beginPath();
+      cx.arc(bx2, by2, r * 0.5, 0, Math.PI*2);
+      cx.strokeStyle = `rgba(18,8,12,${alpha * 0.4})`;
+      cx.lineWidth = 0.2;
+      cx.stroke();
+
+      // Dot rojo en intersección exterior
+      cx.beginPath();
+      cx.arc(bx2, by2, 1.8, 0, Math.PI*2);
+      cx.fillStyle = `rgba(140,47,69,${alpha * 0.8})`;
+      cx.fill();
+    }
+
+    // Estrella de 12 puntas (merkaba doble)
+    for (let tri = 0; tri < 2; tri++) {
+      cx.beginPath();
+      for (let i = 0; i <= 3; i++) {
+        const a = angle + (tri * Math.PI/6) + (i/3) * Math.PI*2;
+        const px = x + Math.cos(a) * r * 0.85;
+        const py = y + Math.sin(a) * r * 0.85;
+        if (i === 0) cx.moveTo(px, py); else cx.lineTo(px, py);
+      }
+      cx.closePath();
+      cx.strokeStyle = `rgba(18,8,12,${alpha * 0.55})`;
+      cx.lineWidth = 0.3;
+      cx.stroke();
+    }
+
+    // Líneas radiales de 12 (Cubo de Metatrón)
+    for (let i = 0; i < 12; i++) {
+      const a = angle + (i/12) * Math.PI*2;
+      cx.beginPath();
+      cx.moveTo(x, y);
+      cx.lineTo(x + Math.cos(a)*r, y + Math.sin(a)*r);
+      cx.strokeStyle = `rgba(18,8,12,${alpha * 0.3})`;
+      cx.lineWidth = 0.2;
+      cx.stroke();
+
+      // Dot en el contorno exterior
+      if (i % 2 === 0) {
+        cx.beginPath();
+        cx.arc(x + Math.cos(a)*r*0.75, y + Math.sin(a)*r*0.75, 1.2, 0, Math.PI*2);
+        cx.fillStyle = rose;
+        cx.fill();
+      }
+    }
+
+    // Conector entre pétalos (anillo interno hexagonal)
+    cx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const a = angle + (i/n)*Math.PI*2;
+      const px = x + Math.cos(a)*r*0.5;
+      const py = y + Math.sin(a)*r*0.5;
+      if (i===0) cx.moveTo(px,py); else cx.lineTo(px,py);
+    }
+    cx.closePath();
+    cx.strokeStyle = `rgba(18,8,12,${alpha * 0.5})`;
+    cx.lineWidth = 0.3;
+    cx.stroke();
+
+    // Dot central
+    cx.beginPath();
+    cx.arc(x, y, 2.5, 0, Math.PI*2);
+    cx.fillStyle = `rgba(140,47,69,${alpha})`;
+    cx.fill();
+  }
+
+  function draw(){
+    t++;
+    cx.clearRect(0, 0, W, H);
+
+    NODES.forEach(node => {
+      const screenY = node.ay - scrollY;
+      // Solo dibujar si está cerca del viewport (con margen)
+      if (screenY < -node.r * 1.5 || screenY > H + node.r * 1.5) return;
+
+      const screenX = W * node.ax;
+      const angle   = t * node.spd + node.phase;
+
+      // Fade in/out suave según qué tan cerca está del borde
+      const margin = node.r * 1.2;
+      let alpha = 0.55;
+      if (screenY < margin)        alpha *= Math.max(0, screenY / margin);
+      if (screenY > H - margin)    alpha *= Math.max(0, (H - screenY) / margin);
+
+      flowerOfLife(screenX, screenY, node.r, angle, alpha);
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
 })();
 </script>
 
