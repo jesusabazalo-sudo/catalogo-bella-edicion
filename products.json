@@ -1468,5 +1468,23 @@
     "oferta": false,
     "nuevo": true,
     "disponible": true
+  },
+  {
+    "id": 74,
+    "nombre": "Natura Kaiak Jabón en Barra",
+    "marca": "Natura",
+    "categoria_web": "Cuidado personal",
+    "subcategoria": "Jabón corporal",
+    "publico": "Unisex",
+    "presentacion": "90g",
+    "precio_antes": 18,
+    "precio": 15,
+    "precio_abierto": 11,
+    "descripcion": "Jabón en barra de la línea Kaiak, con fragancia fresca y acuática. Limpia y perfuma la piel en cada baño.",
+    "imagen": "images/item74.jpg",
+    "nuevo": true,
+    "destacado": false,
+    "oferta": false,
+    "disponible": true
   }
 ]
