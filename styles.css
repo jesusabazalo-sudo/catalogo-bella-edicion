@@ -322,18 +322,47 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 .badges { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; z-index: 2; pointer-events: none; }
 .badge {
   font-size: 10px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 5px;
+  font-weight: 700;
   color: #fff;
   white-space: nowrap;
   line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.18);
+  animation: badgeGlow 2.8s ease-in-out infinite;
 }
-.badge.nuevo { background: var(--rose); }
-.badge.oferta { background: #C24A36; }
-.badge.destacado { background: var(--gold); color: #2B2220; }
+.badge::after {
+  content: '';
+  position: absolute;
+  top: -60%; left: -90%;
+  width: 55%; height: 220%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  transform: skewX(-22deg);
+  animation: badgeShine 3.8s ease-in-out infinite;
+}
+.badge.nuevo  { background: var(--bd-nuevo, linear-gradient(135deg,#8B2335,#C13B4D)); animation-delay: 0s; }
+.badge.nuevo::after  { animation-delay: 0s; }
+.badge.oferta { background: var(--bd-oferta, linear-gradient(135deg,#C24A36,#E06040)); animation-delay: 0.9s; }
+.badge.oferta::after { animation-delay: 1.3s; }
+.badge.destacado { background: var(--bd-dest, linear-gradient(135deg,#9B7B1A,#C9A24B)); color: #fff; animation-delay: 1.8s; }
+.badge.destacado::after { animation-delay: 2.6s; }
+
+@keyframes badgeShine {
+  0%, 25%  { left: -90%; opacity: 0; }
+  30%      { opacity: 1; }
+  65%      { left: 130%; opacity: 0; }
+  100%     { left: 130%; opacity: 0; }
+}
+@keyframes badgeGlow {
+  0%,100% { box-shadow: 0 2px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.18), 0 0 6px var(--bd-glow,rgba(200,60,60,0.3)); }
+  50%     { box-shadow: 0 3px 12px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.22), 0 0 16px var(--bd-glow,rgba(200,60,60,0.45)); }
+}
+
+
 
 .card-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .card-brand { font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
