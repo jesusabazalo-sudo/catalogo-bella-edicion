@@ -99,6 +99,33 @@ function renderGrid() {
   empty.hidden = true;
 
   grid.innerHTML = list.map(cardHTML).join("");
+  setupCards();
+}
+
+// === ANIMACIÓN DE ENTRADA EN CASCADA ===
+function setupCards() {
+  if (window._co) window._co.disconnect();
+  const cards = document.querySelectorAll('.card');
+
+  window._co = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const card = e.target;
+      card.classList.add('card-in');
+      const delay = parseInt(card.style.getPropertyValue('--cd')) || 0;
+      setTimeout(() => {
+        card.classList.remove('card-in');
+        card.classList.add('card-done');
+      }, delay + 580);
+      window._co.unobserve(card);
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+
+  cards.forEach((card, i) => {
+    // Retardo en cascada: 0ms, 100ms, 200ms, 300ms, luego repite por fila
+    card.style.setProperty('--cd', `${(i % 4) * 100}ms`);
+    window._co.observe(card);
+  });
 }
 
 // ===================== EVENTS: grid =====================
