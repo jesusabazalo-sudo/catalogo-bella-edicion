@@ -330,5 +330,32 @@
 })();
 </script>
 
+<!-- Paleta de badges según día de la semana -->
+<script>
+(function(){
+  const P = [
+    // 0 Dom – Bordeaux/Champagne
+    { n:'linear-gradient(135deg,#6B1030,#A82848)', o:'linear-gradient(135deg,#8B2020,#C04040)', d:'linear-gradient(135deg,#7A5C18,#B09040)', g:'rgba(168,40,72,0.45)' },
+    // 1 Lun – Rosa/Dorado (clásico)
+    { n:'linear-gradient(135deg,#8B2335,#C13B4D)', o:'linear-gradient(135deg,#C24A36,#E06040)', d:'linear-gradient(135deg,#9B7B1A,#C9A24B)', g:'rgba(193,59,77,0.45)' },
+    // 2 Mar – Violeta/Lavanda
+    { n:'linear-gradient(135deg,#5B2D8E,#8B5CC0)', o:'linear-gradient(135deg,#7B3A9A,#AA66CC)', d:'linear-gradient(135deg,#4A5A90,#7090C0)', g:'rgba(139,92,192,0.45)' },
+    // 3 Mié – Esmeralda/Menta
+    { n:'linear-gradient(135deg,#1B6B3A,#2DA860)', o:'linear-gradient(135deg,#226B4A,#38B070)', d:'linear-gradient(135deg,#3A7B1A,#60B030)', g:'rgba(45,168,96,0.45)' },
+    // 4 Jue – Zafiro/Celeste
+    { n:'linear-gradient(135deg,#1A3A8B,#2D60C8)', o:'linear-gradient(135deg,#1A5088,#2A88B8)', d:'linear-gradient(135deg,#1A4A9B,#3078C8)', g:'rgba(45,96,200,0.45)' },
+    // 5 Vie – Coral/Sunset
+    { n:'linear-gradient(135deg,#C03050,#E87070)', o:'linear-gradient(135deg,#D05020,#F08848)', d:'linear-gradient(135deg,#C08020,#E0B848)', g:'rgba(224,112,112,0.45)' },
+    // 6 Sáb – Fucsia/Rosa caliente
+    { n:'linear-gradient(135deg,#A02060,#D84098)', o:'linear-gradient(135deg,#B03070,#E060A8)', d:'linear-gradient(135deg,#882050,#C05088)', g:'rgba(216,64,152,0.45)' },
+  ];
+  const p = P[new Date().getDay()];
+  const r = document.documentElement.style;
+  r.setProperty('--bd-nuevo',  p.n);
+  r.setProperty('--bd-oferta', p.o);
+  r.setProperty('--bd-dest',   p.d);
+  r.setProperty('--bd-glow',   p.g);
+})();
+</script>
 </body>
 </html>
