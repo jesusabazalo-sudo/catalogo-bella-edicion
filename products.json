@@ -1444,5 +1444,26 @@
     "destacado": false,
     "oferta": false,
     "disponible": true
+  },
+  {
+    "id": 75,
+    "nombre": "Natura Humor + Confiança Deo Colonia",
+    "marca": "Natura",
+    "categoria_web": "Perfumes unisex",
+    "categoria_original": "Perfumes y fragancias",
+    "subcategoria": "Eau de Toilette / Deo Colonia",
+    "publico": "Unisex",
+    "presentacion": "75 ml",
+    "estado_empaque": "Cerrado",
+    "precio_antes": 85,
+    "precio": 69,
+    "precio_abierto": 52,
+    "descripcion": "Fragancia fresca y cítrica con notas amaderadas. Una colonia que transmite seguridad y bienestar en cada spray.",
+    "notas": "",
+    "imagen": "images/item75.jpg",
+    "destacado": true,
+    "oferta": false,
+    "nuevo": true,
+    "disponible": true
   }
 ]
