@@ -1,26 +1,5 @@
 [
   {
-    "id": 1,
-    "nombre": "Natura Ekos Maracuyá Frescor Corporal",
-    "marca": "Natura",
-    "categoria_web": "Perfumes unisex",
-    "categoria_original": "Perfumes y fragancias",
-    "subcategoria": "Frescor / body splash",
-    "publico": "Unisex",
-    "presentacion": "150 ml",
-    "estado_empaque": "Cerrado",
-    "precio_antes": 100,
-    "precio": 79,
-    "precio_abierto": 60,
-    "descripcion": "Frescor corporal de maracuyá, ideal para uso diario después del baño o para refrescar la piel.",
-    "notas": "Producto en caja; nombre leído desde la foto.",
-    "imagen": "images/item1.jpg",
-    "destacado": true,
-    "oferta": false,
-    "nuevo": true,
-    "disponible": true
-  },
-  {
     "id": 2,
     "nombre": "Natura Ekos Pitanga Frescor",
     "marca": "Natura",
