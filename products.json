@@ -357,27 +357,6 @@
     "disponible": true
   },
   {
-    "id": 20,
-    "nombre": "Ésika Vibranza Le Bloom Perfume",
-    "marca": "Ésika",
-    "categoria_web": "Perfumes mujer",
-    "categoria_original": "Perfumes y fragancias",
-    "subcategoria": "Perfume mujer",
-    "publico": "Mujer",
-    "presentacion": "Por confirmar",
-    "estado_empaque": "Cerrado",
-    "precio_antes": 145,
-    "precio": 115,
-    "precio_abierto": 86,
-    "descripcion": "Perfume femenino de la línea Vibranza Le Bloom, con presentación rosada moderna.",
-    "notas": "Tiene sticker visible S/55. Foto es la caja propia (no se encontró foto de catálogo exacta de 'Le Bloom').",
-    "imagen": "images/item20.jpg",
-    "destacado": true,
-    "oferta": true,
-    "nuevo": true,
-    "disponible": true
-  },
-  {
     "id": 21,
     "nombre": "Ésika Vibranza Perfume",
     "marca": "Ésika",
