@@ -78,62 +78,18 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; margin: 0; }
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.3px;
+  color: var(--rose-dark);
   display: inline-flex;
   align-items: baseline;
   position: relative;
 }
 .bl {
   display: inline-block;
-  background: linear-gradient(90deg,
-    var(--rose-dark) 0%,
-    var(--rose-dark) 20%,
-    #F5D78E 45%,
-    #fffaf0 50%,
-    #F5D78E 55%,
-    var(--rose-dark) 80%,
-    var(--rose-dark) 100%
-  );
-  background-size: 400% 100%;
-  background-position: 200% 0;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation:
-    blWave  3.5s ease-in-out infinite,
-    blShine 5s   ease-in-out infinite;
-  animation-delay:
-    calc(var(--i) * 0.07s),
-    calc(var(--i) * 0.05s);
+  color: var(--rose-dark);
 }
 .brand-space { width: 6px; }
-@keyframes blWave {
-  0%,100% { transform: translateY(0)    rotate(0deg); }
-  20%      { transform: translateY(-2px) rotate(-0.6deg); }
-  50%      { transform: translateY(1.5px) rotate(0.4deg); }
-  75%      { transform: translateY(-1px) rotate(-0.2deg); }
-}
-@keyframes blShine {
-  0%, 25%      { background-position: 200% 0; }
-  60%          { background-position: -100% 0; }
-  75%, 100%    { background-position: -100% 0; }
-}
-.brand-spark {
-  font-size: 9px;
-  color: var(--gold);
-  -webkit-text-fill-color: var(--gold);
-  margin-left: 3px;
-  opacity: 0;
-  transform: scale(0);
-  display: inline-block;
-  animation: sparkPop 5s ease-in-out infinite;
-  animation-delay: 0.8s;
-}
-@keyframes sparkPop {
-  0%, 54%  { opacity: 0; transform: scale(0); }
-  60%      { opacity: 1; transform: scale(1.6); }
-  68%      { opacity: 0.6; transform: scale(0.9); }
-  75%,100% { opacity: 0; transform: scale(0); }
-}
+.brand-spark { display: none; }
+
 
 .brand-sub { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); }
 
