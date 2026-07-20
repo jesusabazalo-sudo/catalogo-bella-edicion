@@ -42,7 +42,6 @@ function cardHTML(p) {
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
         </div>
-        <span class="price-open">${p.precio_abierto > 0 ? `Abierto/sin caja: ${CONFIG.currency}${p.precio_abierto}` : ''}</span>
         <button class="add-btn" data-action="add" data-id="${p.id}">Agregar a mi lista</button>
       </div>
     </div>
@@ -288,7 +287,6 @@ function openModal(id) {
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
         </div>
-        <span class="price-open">${p.precio_abierto > 0 ? `Abierto/sin caja: ${CONFIG.currency}${p.precio_abierto}` : ''}</span>
         <button class="add-btn" style="margin-top:16px" data-action="add" data-id="${p.id}">Agregar a mi lista</button>
       </div>
     </div>`;
