@@ -213,5 +213,451 @@ setTimeout(function(){
   setTimeout(function(){ document.getElementById('intro').remove(); }, 750);
 }, 2000);
 </script>
+
+<!-- ═══════════════════════════════════════════
+     PANEL ADMIN SECRETO — BELLA EDICIÓN
+     Trigger: triple clic en © del footer
+     PIN: 2412
+══════════════════════════════════════════════ -->
+<style>
+/* Footer discreto */
+#be-footer{text-align:center;padding:22px 0 18px;font-size:11.5px;color:#C0A89A;letter-spacing:.5px;}
+#be-trig{cursor:pointer;user-select:none;color:#C0A89A;transition:color .2s;}
+#be-trig:hover{color:#8B2335;}
+
+/* PIN overlay */
+#ap-pin{display:none;position:fixed;inset:0;z-index:99999;background:rgba(18,5,10,.92);
+  backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+#ap-pin.open{display:flex;}
+.ap-pin-box{background:#1E0810;border:1px solid rgba(201,162,75,.35);border-radius:18px;
+  padding:36px 32px 28px;display:flex;flex-direction:column;align-items:center;gap:18px;min-width:290px;}
+.ap-pin-title{color:#C9A24B;font-size:13px;letter-spacing:3px;text-transform:uppercase;font-family:'Jost',sans-serif;}
+.ap-pin-display{display:flex;gap:12px;margin:4px 0;}
+.ap-pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #C9A24B;background:transparent;transition:.2s;}
+.ap-pin-dot.filled{background:#C9A24B;}
+.ap-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.ap-num{background:rgba(201,162,75,.08);border:1.5px solid rgba(201,162,75,.22);border-radius:12px;
+  color:#fff;font-size:20px;font-weight:500;width:68px;height:56px;cursor:pointer;
+  font-family:'Cormorant Garamond',serif;transition:.15s;}
+.ap-num:hover{background:rgba(201,162,75,.2);border-color:#C9A24B;}
+.ap-num.del{font-size:18px;color:#C9A24B;}
+.ap-num.ok{background:rgba(139,35,53,.3);border-color:#8B2335;color:#FF8090;}
+.ap-pin-err{color:#FF6080;font-size:12px;height:16px;font-family:'Jost',sans-serif;}
+
+/* Admin panel */
+#ap-panel{display:none;position:fixed;inset:0;z-index:99998;background:#0E0408;
+  flex-direction:column;overflow:hidden;}
+#ap-panel.open{display:flex;}
+.ap-header{background:#1A0810;border-bottom:1px solid rgba(201,162,75,.25);
+  padding:14px 22px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.ap-header h1{color:#C9A24B;font-size:15px;letter-spacing:2px;font-family:'Jost',sans-serif;
+  text-transform:uppercase;flex:1;}
+.ap-hbtn{background:rgba(201,162,75,.12);border:1px solid rgba(201,162,75,.3);
+  color:#C9A24B;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;
+  font-family:'Jost',sans-serif;transition:.15s;}
+.ap-hbtn:hover{background:rgba(201,162,75,.25);}
+.ap-hbtn.close{background:rgba(139,35,53,.2);border-color:rgba(139,35,53,.4);color:#FF8090;}
+.ap-hbtn.close:hover{background:rgba(139,35,53,.4);}
+.ap-hbtn.save{background:rgba(45,120,60,.25);border-color:rgba(45,180,80,.4);color:#60E880;}
+.ap-hbtn.save:hover{background:rgba(45,120,60,.45);}
+
+/* Barra de búsqueda */
+.ap-toolbar{padding:12px 22px;display:flex;gap:10px;background:#140610;border-bottom:1px solid rgba(255,255,255,.06);}
+.ap-search{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:9px 14px;color:#fff;font-size:13px;font-family:'Jost',sans-serif;}
+.ap-search:focus{outline:none;border-color:rgba(201,162,75,.5);}
+.ap-search::placeholder{color:rgba(255,255,255,.35);}
+.ap-cat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:9px 12px;color:#ddd;font-size:12px;font-family:'Jost',sans-serif;}
+
+/* Grid de productos en admin */
+.ap-grid-wrap{flex:1;overflow-y:auto;padding:18px 20px;}
+.ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+.ap-card{background:#1A0810;border:1px solid rgba(255,255,255,.08);border-radius:12px;
+  overflow:hidden;cursor:pointer;transition:.2s;position:relative;}
+.ap-card:hover{border-color:rgba(201,162,75,.5);transform:translateY(-2px);}
+.ap-card.changed::after{content:'✏️';position:absolute;top:6px;right:6px;font-size:13px;}
+.ap-card img{width:100%;aspect-ratio:1;object-fit:contain;background:#0E0408;padding:6px;}
+.ap-card-info{padding:8px 10px 10px;}
+.ap-card-name{color:#ddd;font-size:11px;line-height:1.3;margin-bottom:4px;
+  font-family:'Jost',sans-serif;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;}
+.ap-card-price{color:#C9A24B;font-size:13px;font-weight:600;font-family:'Cormorant Garamond',serif;}
+.ap-card-brand{color:#888;font-size:10px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+
+/* Modal de edición */
+#ap-edit{display:none;position:absolute;inset:0;z-index:10;background:#0E0408;
+  flex-direction:column;overflow:hidden;}
+#ap-edit.open{display:flex;}
+.ap-edit-header{background:#1A0810;border-bottom:1px solid rgba(201,162,75,.2);
+  padding:12px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.ap-back{background:none;border:none;color:#C9A24B;font-size:22px;cursor:pointer;padding:2px 6px;}
+.ap-edit-title{color:#fff;font-size:14px;font-family:'Jost',sans-serif;flex:1;}
+.ap-edit-body{flex:1;overflow-y:auto;padding:20px;}
+.ap-edit-img-wrap{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px;}
+.ap-img-prev{width:130px;height:130px;object-fit:contain;background:#1A0810;
+  border-radius:12px;border:1px solid rgba(255,255,255,.1);padding:6px;flex-shrink:0;}
+.ap-img-actions{display:flex;flex-direction:column;gap:8px;flex:1;}
+.ap-img-note{color:#888;font-size:11px;line-height:1.5;}
+.ap-upload-btn{background:rgba(201,162,75,.12);border:1.5px dashed rgba(201,162,75,.4);
+  border-radius:10px;color:#C9A24B;padding:10px 14px;font-size:12px;cursor:pointer;
+  font-family:'Jost',sans-serif;text-align:center;transition:.15s;}
+.ap-upload-btn:hover{background:rgba(201,162,75,.22);}
+#ap-file{display:none;}
+.ap-field{margin-bottom:14px;}
+.ap-label{display:block;color:#888;font-size:11px;letter-spacing:.8px;text-transform:uppercase;
+  margin-bottom:6px;font-family:'Jost',sans-serif;}
+.ap-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;font-family:'Jost',sans-serif;
+  transition:.15s;}
+.ap-input:focus{outline:none;border-color:rgba(201,162,75,.55);background:rgba(201,162,75,.05);}
+.ap-price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ap-save-btn{width:100%;background:linear-gradient(135deg,#6B1828,#A02035);border:none;
+  border-radius:12px;color:#fff;padding:14px;font-size:14px;font-weight:600;cursor:pointer;
+  font-family:'Jost',sans-serif;margin-top:8px;transition:.2s;letter-spacing:.5px;}
+.ap-save-btn:hover{background:linear-gradient(135deg,#8B2335,#C13B4D);}
+.ap-saved-msg{color:#60E880;font-size:12px;text-align:center;margin-top:8px;
+  font-family:'Jost',sans-serif;height:18px;}
+
+/* Export modal */
+#ap-export{display:none;position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.7);
+  align-items:center;justify-content:center;}
+#ap-export.open{display:flex;}
+.ap-exp-box{background:#1A0810;border:1px solid rgba(201,162,75,.3);border-radius:16px;
+  padding:28px;max-width:480px;width:90%;display:flex;flex-direction:column;gap:14px;}
+.ap-exp-box h2{color:#C9A24B;font-size:14px;letter-spacing:1px;font-family:'Jost',sans-serif;}
+.ap-exp-box p{color:#aaa;font-size:12px;line-height:1.6;}
+.ap-exp-btns{display:flex;flex-direction:column;gap:8px;}
+.ap-dl-btn{background:rgba(45,120,60,.25);border:1px solid rgba(45,180,80,.35);
+  border-radius:10px;color:#60E880;padding:11px 16px;font-size:13px;cursor:pointer;
+  font-family:'Jost',sans-serif;text-align:left;transition:.15s;}
+.ap-dl-btn:hover{background:rgba(45,120,60,.45);}
+.ap-exp-close{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;color:#aaa;padding:10px;font-size:13px;cursor:pointer;
+  font-family:'Jost',sans-serif;transition:.15s;}
+.ap-exp-close:hover{background:rgba(255,255,255,.1);}
+
+@media(max-width:600px){
+  .ap-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+  .ap-price-row{grid-template-columns:1fr;}
+  .ap-header h1{font-size:12px;}
+}
+</style>
+
+<!-- Footer con trigger secreto -->
+<footer id="be-footer">
+  <span id="be-trig" title="">©</span> Bella Edición 2025
+</footer>
+
+<!-- PIN overlay -->
+<div id="ap-pin">
+  <div class="ap-pin-box">
+    <div class="ap-pin-title">Acceso privado</div>
+    <div class="ap-pin-display">
+      <div class="ap-pin-dot" id="pd0"></div>
+      <div class="ap-pin-dot" id="pd1"></div>
+      <div class="ap-pin-dot" id="pd2"></div>
+      <div class="ap-pin-dot" id="pd3"></div>
+    </div>
+    <div class="ap-numpad">
+      <button class="ap-num" onclick="apNum('1')">1</button>
+      <button class="ap-num" onclick="apNum('2')">2</button>
+      <button class="ap-num" onclick="apNum('3')">3</button>
+      <button class="ap-num" onclick="apNum('4')">4</button>
+      <button class="ap-num" onclick="apNum('5')">5</button>
+      <button class="ap-num" onclick="apNum('6')">6</button>
+      <button class="ap-num" onclick="apNum('7')">7</button>
+      <button class="ap-num" onclick="apNum('8')">8</button>
+      <button class="ap-num" onclick="apNum('9')">9</button>
+      <button class="ap-num del" onclick="apDel()">⌫</button>
+      <button class="ap-num" onclick="apNum('0')">0</button>
+      <button class="ap-num ok" onclick="apClose()">✕</button>
+    </div>
+    <div class="ap-pin-err" id="ap-err"></div>
+  </div>
+</div>
+
+<!-- Panel admin principal -->
+<div id="ap-panel">
+  <div class="ap-header">
+    <h1>✦ Panel Bella Edición</h1>
+    <button class="ap-hbtn save" onclick="apOpenExport()">⬇ Guardar cambios</button>
+    <button class="ap-hbtn close" onclick="apPanelClose()">✕ Salir</button>
+  </div>
+  <div class="ap-toolbar">
+    <input class="ap-search" id="ap-search" placeholder="🔍 Buscar producto...">
+    <select class="ap-cat" id="ap-cat">
+      <option value="">Todas las categorías</option>
+    </select>
+  </div>
+  <div class="ap-grid-wrap">
+    <div class="ap-grid" id="ap-grid"></div>
+  </div>
+
+  <!-- Edición de producto (overlay dentro del panel) -->
+  <div id="ap-edit">
+    <div class="ap-edit-header">
+      <button class="ap-back" onclick="apBackList()">←</button>
+      <span class="ap-edit-title" id="ap-edit-title">Editar producto</span>
+    </div>
+    <div class="ap-edit-body">
+      <div class="ap-edit-img-wrap">
+        <img class="ap-img-prev" id="ap-img-prev" src="" alt="">
+        <div class="ap-img-actions">
+          <div class="ap-img-note">Foto actual del producto. Toca el botón para cambiarla.</div>
+          <label class="ap-upload-btn" for="ap-file">📷 Cambiar foto</label>
+          <input type="file" id="ap-file" accept="image/*" onchange="apImageChange(this)">
+          <div id="ap-img-changed" style="color:#60E880;font-size:11px;display:none">✓ Nueva foto lista</div>
+        </div>
+      </div>
+      <div class="ap-field">
+        <label class="ap-label">Nombre del producto</label>
+        <input class="ap-input" id="ap-f-nombre" type="text" placeholder="Nombre completo...">
+      </div>
+      <div class="ap-field">
+        <label class="ap-label">Marca</label>
+        <input class="ap-input" id="ap-f-marca" type="text" placeholder="Marca...">
+      </div>
+      <div class="ap-field">
+        <label class="ap-label">Presentación (tamaño/cantidad)</label>
+        <input class="ap-input" id="ap-f-pres" type="text" placeholder="Ej: 50 ml, 100g...">
+      </div>
+      <div class="ap-price-row">
+        <div class="ap-field">
+          <label class="ap-label">Precio tachado (S/)</label>
+          <input class="ap-input" id="ap-f-antes" type="number" step="0.1" min="0">
+        </div>
+        <div class="ap-field">
+          <label class="ap-label">Precio actual (S/)</label>
+          <input class="ap-input" id="ap-f-precio" type="number" step="0.1" min="0">
+        </div>
+      </div>
+      <button class="ap-save-btn" onclick="apSaveProduct()">✓ Guardar este producto</button>
+      <div class="ap-saved-msg" id="ap-saved-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de exportar -->
+<div id="ap-export">
+  <div class="ap-exp-box">
+    <h2>⬇ Descargar cambios</h2>
+    <p>Descarga el archivo <strong>products.json</strong> actualizado y súbelo a GitHub con el método del lápiz. Si cambiaste fotos, también aparecerán para descargar.</p>
+    <div class="ap-exp-btns" id="ap-exp-btns"></div>
+    <button class="ap-exp-close" onclick="document.getElementById('ap-export').classList.remove('open')">Cerrar</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const PIN = '2412';
+  const RAW = 'https://raw.githubusercontent.com/jesusabazalo-sudo/catalogo-bella-edicion/main/products.json';
+  let products = [], changes = {}, currentId = null, pinEntered = '';
+  let clicks = 0, clickT = null;
+
+  // ── TRIGGER ──────────────────────────────────────
+  document.getElementById('be-trig').addEventListener('click', function(){
+    clicks++;
+    clearTimeout(clickT);
+    clickT = setTimeout(()=>{ clicks=0; }, 700);
+    if(clicks >= 3){ clicks=0; openPin(); }
+  });
+
+  // ── PIN ──────────────────────────────────────────
+  function openPin(){
+    pinEntered=''; updateDots();
+    document.getElementById('ap-err').textContent='';
+    document.getElementById('ap-pin').classList.add('open');
+  }
+  function updateDots(){
+    for(let i=0;i<4;i++)
+      document.getElementById('pd'+i).classList.toggle('filled', i < pinEntered.length);
+  }
+  window.apNum = function(n){
+    if(pinEntered.length >= 4) return;
+    pinEntered += n; updateDots();
+    if(pinEntered.length === 4){
+      if(pinEntered === PIN){
+        document.getElementById('ap-pin').classList.remove('open');
+        openPanel();
+      } else {
+        document.getElementById('ap-err').textContent = 'PIN incorrecto';
+        setTimeout(()=>{ pinEntered=''; updateDots(); document.getElementById('ap-err').textContent=''; }, 800);
+      }
+    }
+  };
+  window.apDel = function(){ pinEntered=pinEntered.slice(0,-1); updateDots(); };
+  window.apClose = function(){ document.getElementById('ap-pin').classList.remove('open'); };
+
+  // ── PANEL ─────────────────────────────────────────
+  function openPanel(){
+    document.getElementById('ap-panel').classList.add('open');
+    if(!products.length) loadProducts();
+  }
+  window.apPanelClose = function(){
+    document.getElementById('ap-panel').classList.remove('open');
+    document.getElementById('ap-edit').classList.remove('open');
+  };
+
+  async function loadProducts(){
+    document.getElementById('ap-grid').innerHTML =
+      '<div style="color:#888;font-size:13px;padding:40px;text-align:center;grid-column:1/-1">⏳ Cargando productos...</div>';
+    try{
+      const r = await fetch(RAW+'?t='+Date.now());
+      products = await r.json();
+      populateCats(); renderGrid();
+    } catch(e){
+      document.getElementById('ap-grid').innerHTML =
+        '<div style="color:#FF6080;font-size:13px;padding:40px;text-align:center;grid-column:1/-1">❌ Error al cargar. Revisa tu conexión.</div>';
+    }
+  }
+
+  function populateCats(){
+    const cats = [...new Set(products.map(p=>p.categoria_web))].sort();
+    const sel = document.getElementById('ap-cat');
+    sel.innerHTML = '<option value="">Todas</option>' +
+      cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  }
+
+  function getFiltered(){
+    const q = document.getElementById('ap-search').value.toLowerCase();
+    const cat = document.getElementById('ap-cat').value;
+    return products.filter(p=>
+      (!q || p.nombre.toLowerCase().includes(q) || p.marca.toLowerCase().includes(q)) &&
+      (!cat || p.categoria_web === cat)
+    );
+  }
+
+  function renderGrid(){
+    const list = getFiltered();
+    const g = document.getElementById('ap-grid');
+    if(!list.length){ g.innerHTML='<div style="color:#888;padding:40px;grid-column:1/-1;text-align:center">Sin resultados</div>'; return; }
+    g.innerHTML = list.map(p=>{
+      const ch = changes[p.id];
+      const imgSrc = ch&&ch.imgUrl ? ch.imgUrl : p.imagen;
+      const precio = ch&&ch.precio!=null ? ch.precio : p.precio;
+      const nombre = ch&&ch.nombre ? ch.nombre : p.nombre;
+      return `<div class="ap-card${ch?' changed':''}" onclick="apEditOpen(${p.id})">
+        <img src="${imgSrc}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22/>'">
+        <div class="ap-card-info">
+          <div class="ap-card-brand">${p.marca}</div>
+          <div class="ap-card-name">${nombre}</div>
+          <div class="ap-card-price">S/ ${precio}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('ap-search').addEventListener('input', renderGrid);
+  document.getElementById('ap-cat').addEventListener('change', renderGrid);
+
+  // ── EDITAR PRODUCTO ───────────────────────────────
+  window.apEditOpen = function(id){
+    currentId = id;
+    const p = products.find(x=>x.id===id);
+    const ch = changes[id] || {};
+    document.getElementById('ap-edit-title').textContent = p.marca + ' — ' + p.nombre.substring(0,30);
+    const imgSrc = ch.imgUrl || p.imagen;
+    document.getElementById('ap-img-prev').src = imgSrc;
+    document.getElementById('ap-f-nombre').value = ch.nombre != null ? ch.nombre : p.nombre;
+    document.getElementById('ap-f-marca').value = ch.marca != null ? ch.marca : p.marca;
+    document.getElementById('ap-f-pres').value = ch.presentacion != null ? ch.presentacion : (p.presentacion||'');
+    document.getElementById('ap-f-antes').value = ch.precio_antes != null ? ch.precio_antes : p.precio_antes;
+    document.getElementById('ap-f-precio').value = ch.precio != null ? ch.precio : p.precio;
+    document.getElementById('ap-img-changed').style.display = ch.imgFile ? 'block' : 'none';
+    document.getElementById('ap-saved-msg').textContent = '';
+    document.getElementById('ap-file').value = '';
+    document.getElementById('ap-edit').classList.add('open');
+  };
+
+  window.apBackList = function(){
+    document.getElementById('ap-edit').classList.remove('open');
+    renderGrid();
+  };
+
+  window.apImageChange = function(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const url = e.target.result;
+      document.getElementById('ap-img-prev').src = url;
+      document.getElementById('ap-img-changed').style.display = 'block';
+      if(!changes[currentId]) changes[currentId]={};
+      changes[currentId].imgUrl = url;
+      changes[currentId].imgFile = file;
+      changes[currentId].imgName = `item${currentId}.jpg`;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.apSaveProduct = function(){
+    const id = currentId;
+    if(!changes[id]) changes[id]={};
+    const p = products.find(x=>x.id===id);
+    const nombre = document.getElementById('ap-f-nombre').value.trim();
+    const marca = document.getElementById('ap-f-marca').value.trim();
+    const pres = document.getElementById('ap-f-pres').value.trim();
+    const antes = parseFloat(document.getElementById('ap-f-antes').value);
+    const precio = parseFloat(document.getElementById('ap-f-precio').value);
+    if(nombre) changes[id].nombre = nombre;
+    if(marca) changes[id].marca = marca;
+    if(pres !== undefined) changes[id].presentacion = pres;
+    if(!isNaN(antes)) changes[id].precio_antes = antes;
+    if(!isNaN(precio)) changes[id].precio = precio;
+    // Aplicar al objeto en memoria también
+    if(nombre) p.nombre = nombre;
+    if(marca) p.marca = marca;
+    if(pres !== undefined) p.presentacion = pres;
+    if(!isNaN(antes)) p.precio_antes = antes;
+    if(!isNaN(precio)) p.precio = precio;
+
+    const msg = document.getElementById('ap-saved-msg');
+    msg.textContent = '✓ Guardado en memoria';
+    setTimeout(()=>{ msg.textContent=''; }, 2000);
+  };
+
+  // ── EXPORTAR ──────────────────────────────────────
+  window.apOpenExport = function(){
+    const btns = document.getElementById('ap-exp-btns');
+    // Aplicar cambios de nombres/precios al JSON
+    const updated = JSON.parse(JSON.stringify(products));
+    Object.keys(changes).forEach(id=>{
+      const c = changes[id];
+      const p = updated.find(x=>x.id===parseInt(id));
+      if(!p) return;
+      if(c.nombre) p.nombre=c.nombre;
+      if(c.marca) p.marca=c.marca;
+      if(c.presentacion!==undefined) p.presentacion=c.presentacion;
+      if(c.precio_antes!=null) p.precio_antes=c.precio_antes;
+      if(c.precio!=null) p.precio=c.precio;
+    });
+    const json = JSON.stringify(updated, null, 2);
+    const jsonBlob = new Blob([json], {type:'application/json'});
+    const jsonUrl = URL.createObjectURL(jsonBlob);
+
+    let html = `<button class="ap-dl-btn" onclick="apDL('${jsonUrl}','products.json')">
+      📄 Descargar products.json (${Object.keys(changes).length} cambios)
+    </button>`;
+
+    // Imágenes cambiadas
+    Object.values(changes).forEach(c=>{
+      if(c.imgUrl && c.imgName){
+        html += `<button class="ap-dl-btn" onclick="apDL('${c.imgUrl}','${c.imgName}')">
+          🖼 Descargar ${c.imgName}
+        </button>`;
+      }
+    });
+
+    btns.innerHTML = html;
+    document.getElementById('ap-export').classList.add('open');
+  };
+
+  window.apDL = function(url, name){
+    const a = document.createElement('a');
+    a.href=url; a.download=name; a.click();
+  };
+})();
+</script>
 </body>
 </html>
