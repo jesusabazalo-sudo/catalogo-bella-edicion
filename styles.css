@@ -331,6 +331,11 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 .badge.oferta::after { animation-delay: 1.3s; }
 .badge.destacado { background: var(--bd-dest, linear-gradient(135deg,#9B7B1A,#C9A24B)); color: #fff; animation-delay: 1.8s; }
 .badge.destacado::after { animation-delay: 2.6s; }
+.badge.agotado { background: #6B6B6B; animation: none; box-shadow: none; letter-spacing: 1px; }
+.badge.agotado::after { display: none; }
+.card.agotado .card-img-wrap { opacity: 0.55; }
+.card.agotado .add-btn { background: #9B9B9B; cursor: not-allowed; pointer-events: none; }
+.card.agotado .add-btn:hover { background: #9B9B9B; transform: none; }
 
 @keyframes badgeShine {
   0%, 25%  { left: -90%; opacity: 0; }
