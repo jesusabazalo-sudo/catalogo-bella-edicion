@@ -28,9 +28,10 @@ function cardHTML(p) {
     <div class="card" data-id="${p.id}">
       <div class="card-img-wrap" data-action="open-modal" data-id="${p.id}">
         <div class="badges">
-          ${p.nuevo ? '<span class="badge nuevo">Nuevo</span>' : ""}
-          ${p.oferta ? '<span class="badge oferta">Oferta</span>' : ""}
-          ${p.destacado ? '<span class="badge destacado">Destacado</span>' : ""}
+          ${p.disponible===false ? '<span class="badge agotado">Agotado</span>' : ""}
+          ${p.nuevo && p.disponible!==false ? '<span class="badge nuevo">Nuevo</span>' : ""}
+          ${p.oferta && p.disponible!==false ? '<span class="badge oferta">Oferta</span>' : ""}
+          ${p.destacado && p.disponible!==false ? '<span class="badge destacado">Destacado</span>' : ""}
         </div>
         <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
       </div>
@@ -42,7 +43,9 @@ function cardHTML(p) {
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
         </div>
-        <button class="add-btn" data-action="add" data-id="${p.id}">Agregar a mi lista</button>
+        <button class="add-btn" data-action="add" data-id="${p.id}" ${p.disponible===false?'disabled style="background:#9B9B9B;cursor:not-allowed"':''}>
+          ${p.disponible===false ? 'Sin stock' : 'Agregar a mi lista'}
+        </button>
       </div>
     </div>
   `;
