@@ -68,7 +68,7 @@ function buildCategoryNav() {
 
 // ===================== GRID =====================
 function getFiltered() {
-  let list = PRODUCTS.filter(p => p.disponible !== false);
+let list = [...PRODUCTS];
   if (activeCategory !== "Todos") list = list.filter(p => p.categoria_web === activeCategory);
   if (searchTerm.trim()) {
     const q = searchTerm.toLowerCase();
