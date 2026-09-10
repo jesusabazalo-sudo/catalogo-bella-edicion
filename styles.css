@@ -550,3 +550,45 @@ body {
   margin-top: 8px !important;
   width: 100% !important;
 }
+
+/* ===================================================
+   DISEÑO PARA PRODUCTOS AGOTADOS
+   =================================================== */
+
+/* Detecta cuando el producto está agotado */
+.card:has(.badge-agotado),
+.card.agotado {
+  position: relative;
+  opacity: 0.65;
+  filter: grayscale(0.9); /* Convierte la tarjeta a escala de grises */
+  pointer-events: auto;
+}
+
+/* Franja / Cinta de AGOTADO sobre la imagen */
+.card:has(.badge-agotado) .card-img-wrap::after,
+.card.agotado .card-img-wrap::after {
+  content: "AGOTADO";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-10deg);
+  background-color: rgba(30, 30, 30, 0.88);
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 8px 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+/* Botón de producto agotado */
+.card:has(.badge-agotado) .add-btn,
+.card.agotado .add-btn {
+  background-color: #8C8780 !important;
+  color: #EFEFEF !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
