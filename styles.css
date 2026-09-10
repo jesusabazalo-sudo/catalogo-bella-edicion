@@ -592,3 +592,45 @@ body {
   cursor: not-allowed !important;
   pointer-events: none !important;
 }
+
+/* Cubre productos agotados, sin stock o con botón deshabilitado */
+.card:has(.badge-agotado),
+.card:has(.badge-sin-stock),
+.card:has(.badge.agotado),
+.card:has(button:disabled),
+.card.agotado {
+  position: relative;
+  opacity: 0.65;
+  filter: grayscale(0.9);
+}
+
+/* Franja sobre la imagen */
+.card:has(.badge-agotado) .card-img-wrap::after,
+.card:has(.badge-sin-stock) .card-img-wrap::after,
+.card:has(button:disabled) .card-img-wrap::after,
+.card.agotado .card-img-wrap::after {
+  content: "AGOTADO";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-10deg);
+  background-color: rgba(30, 30, 30, 0.9);
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 8px 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+/* Botón deshabilitado */
+.card:has(button:disabled) .add-btn,
+.card.agotado .add-btn {
+  background-color: #8C8780 !important;
+  color: #EFEFEF !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
