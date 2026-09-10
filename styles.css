@@ -486,3 +486,67 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
 .modal-price-row .price-before { font-size: 15px; }
 .modal-price-row .price-now { font-size: 26px; }
 .modal-info .add-btn { display: block; width: 100%; }
+
+/* ===================================================
+   AJUSTES: FONDO, RECUADRO DE IMÁGENES Y ALINEACIÓN
+   =================================================== */
+
+/* 1. Fondo crema suave para la página */
+body {
+  background-color: #FAF7F2 !important;
+}
+
+/* 2. Recuadro blanco para las imágenes */
+.card-img-wrap {
+  background-color: #FFFFFF !important;
+  border-radius: 14px !important;
+  border: 1px solid #ECE6DE !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.card-img-wrap img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* 3. Alineación uniforme de tarjetas, textos y botones */
+.card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+.card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+}
+
+.card-name {
+  min-height: 2.7em !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.price-row {
+  margin-top: auto !important;
+  padding-top: 8px !important;
+}
+
+.add-btn {
+  margin-top: 8px !important;
+  width: 100% !important;
+}
