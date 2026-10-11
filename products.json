@@ -1527,7 +1527,7 @@
     "destacado": false,
     "oferta": false,
     "nuevo": true,
-    "disponible": true
+    "disponible": false
   },
   {
     "id": 79,
@@ -2266,16 +2266,16 @@
   },
   {
     "id": 114,
-    "nombre": "Esmalte Pimienta Caliente Ésika",
+    "nombre": "Labial Líquido Hidracolor Matte",
     "marca": "Ésika",
-    "categoria_web": "",
+    "categoria_web": "Cosméticos",
     "categoria_original": "Cosméticos",
     "subcategoria": "Labiales",
     "publico": "Mujer",
     "presentacion": "Unidad",
     "estado_empaque": "Cerrado",
-    "precio_antes": 29,
-    "precio": 18,
+    "precio_antes": 34,
+    "precio": 25,
     "precio_abierto": null,
     "descripcion": "Labial Líquido Hidracolor Matte de Ésika.",
     "notas": null,
