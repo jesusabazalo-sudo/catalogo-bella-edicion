@@ -634,3 +634,104 @@ body {
   cursor: not-allowed !important;
   pointer-events: none !important;
 }
+/* ===================================================
+   MODO EDICIÓN RÁPIDA EN EL CATÁLOGO
+   =================================================== */
+
+/* 1. Botón secreto del lapicito en la cabecera (círculo rojo) */
+.admin-quick-btn {
+  background: transparent !important;
+  border: none !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  opacity: 0.15; /* Muy tenue para clientes */
+  transition: opacity 0.2s, transform 0.2s !important;
+  padding: 8px !important;
+  margin-left: 10px !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.admin-quick-btn:hover {
+  opacity: 0.9 !important;
+  transform: scale(1.15) !important;
+}
+
+/* 2. Barra flotante cuando el modo edición está activo */
+.be-admin-bar {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1E0810;
+  border: 1px solid #C9A24B;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  padding: 8px 18px;
+  border-radius: 30px;
+  z-index: 99998;
+  align-items: center;
+  gap: 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: #C9A24B;
+}
+
+body.be-admin-active .be-admin-bar {
+  display: flex;
+}
+
+.be-admin-bar button {
+  background: rgba(201, 162, 75, 0.15);
+  border: 1px solid rgba(201, 162, 75, 0.5);
+  color: #FFF;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.be-admin-bar button:hover {
+  background: #C9A24B;
+  color: #1E0810;
+}
+
+/* 3. Indicador de edición sobre cada producto del catálogo */
+body.be-admin-active .card {
+  position: relative !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 0 2px #C9A24B !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+body.be-admin-active .card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 4px 14px rgba(201, 162, 75, 0.4) !important;
+}
+
+body.be-admin-active .card::before {
+  content: "✏️ Editar";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #1E0810;
+  color: #C9A24B;
+  border: 1px solid #C9A24B;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* 4. Asegura que la ventana de edición quede siempre visible */
+#af.open {
+  display: flex !important;
+  z-index: 100000 !important;
+}
