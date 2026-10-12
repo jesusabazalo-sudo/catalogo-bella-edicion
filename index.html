@@ -502,19 +502,24 @@ select.ain option{background:#2A1020;color:#fff;}
   /* PIN */
   const dots=()=>{for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('on',i<pin.length);};
   function openPin(){pin='';dots();document.getElementById('ap-pe').textContent='';document.getElementById('ap-pin').classList.add('open');}
-  window._N=n=>{
+ window._N=n=>{
     if(pin.length>=4)return; pin+=n; dots();
     if(pin.length===4){
       if(pin===PIN){
-  document.getElementById('ap-pin').classList.remove('open');
-  if(window._quickMode){
-    sessionStorage.setItem('be_auth_ok','1');
-    document.body.classList.add('be-admin-active');
-    if(!prods.length&&typeof load==='function')load();
-  } else {
-    openPanel();
-  }
-}
+        document.getElementById('ap-pin').classList.remove('open');
+        if(window._quickMode){
+          sessionStorage.setItem('be_auth_ok','1');
+          document.body.classList.add('be-admin-active');
+          if(!prods.length&&typeof load==='function')load();
+        } else {
+          openPanel();
+        }
+      } else {
+        document.getElementById('ap-pe').textContent='PIN incorrecto';
+        setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);
+      }
+    }
+  };
         /* Lógica de edición directa desde el lapicito */
   window._quickMode = false;
 
