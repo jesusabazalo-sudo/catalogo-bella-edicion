@@ -497,7 +497,77 @@ select.ain option{background:#2A1020;color:#fff;}
   window._N=n=>{
     if(pin.length>=4)return; pin+=n; dots();
     if(pin.length===4){
-      if(pin===PIN){document.getElementById('ap-pin').classList.remove('open');openPanel();}
+      if(pin===PIN){
+  document.getElementById('ap-pin').classList.remove('open');
+  if(window._quickMode){
+    sessionStorage.setItem('be_auth_ok','1');
+    document.body.classList.add('be-admin-active');
+    if(!prods.length&&typeof load==='function')load();
+  } else {
+    openPanel();
+  }
+}
+        /* Lógica de edición directa desde el lapicito */
+  window._quickMode = false;
+
+  // Barra flotante de control
+  const bar = document.createElement('div');
+  bar.className = 'be-admin-bar';
+  bar.innerHTML = `
+    <span>🛠️ Modo Edición Activo</span>
+    <button id="btnNewQuick">+ Nuevo producto</button>
+    <button id="btnExitQuick">✕ Salir</button>
+  `;
+  document.body.appendChild(bar);
+
+  // Clic en el lapicito de la cabecera
+  const qBtn = document.getElementById('adminQuickBtn');
+  if (qBtn) {
+    qBtn.addEventListener('click', () => {
+      if (document.body.classList.contains('be-admin-active')) {
+        document.body.classList.remove('be-admin-active');
+        return;
+      }
+      if (sessionStorage.getItem('be_auth_ok') === '1') {
+        document.body.classList.add('be-admin-active');
+        if (!prods.length && typeof load === 'function') load();
+      } else {
+        window._quickMode = true;
+        openPin();
+      }
+    });
+  }
+
+  // Botón Nuevo producto de la barra flotante
+  document.getElementById('btnNewQuick').addEventListener('click', () => {
+    isNew = true; curId = null;
+    if (typeof openForm === 'function') openForm();
+    else if (typeof _New === 'function') _New();
+    else document.getElementById('af').classList.add('open');
+  });
+
+  // Botón Salir de la barra flotante
+  document.getElementById('btnExitQuick').addEventListener('click', () => {
+    document.body.classList.remove('be-admin-active');
+  });
+
+  // Clic directo en cualquier tarjeta para editarla
+  document.addEventListener('click', e => {
+    if (!document.body.classList.contains('be-admin-active')) return;
+    const card = e.target.closest('.card');
+    if (card) {
+      const id = parseInt(card.dataset.id || card.getAttribute('data-id'));
+      if (id && typeof window._Edit === 'function') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!prods.length && typeof load === 'function') {
+          load().then(() => window._Edit(id));
+        } else {
+          window._Edit(id);
+        }
+      }
+    }
+  }, true);
       else{document.getElementById('ap-pe').textContent='PIN incorrecto';
         setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);}
     }
