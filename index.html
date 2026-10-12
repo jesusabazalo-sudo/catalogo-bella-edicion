@@ -107,11 +107,7 @@
       <span>Mi lista</span>
       <span class="cart-count" id="cartCount">0</span>
     </button>
-    <button id="adminQuickBtn" class="admin-quick-btn" title="Modo Admin" aria-label="Modo Admin">✏️</button>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h2l1.5 11.5A2 2 0 0 0 8.5 19h9a2 2 0 0 0 2-1.7L21 9H6"/><circle cx="9" cy="22" r="1.3" fill="currentColor"/><circle cx="18" cy="22" r="1.3" fill="currentColor"/></svg>
-      <span>Mi lista</span>
-      <span class="cart-count" id="cartCount">0</span>
-    </button>
+    <button id="adminQuickBtn" class="admin-quick-btn" title="Modo Admin" aria-label="Modo Admin" onclick="_LapizTripleClic()">✏️</button>
   </div>
 
   <div class="cat-nav-wrap">
@@ -501,25 +497,39 @@ select.ain option{background:#2A1020;color:#fff;}
 
   /* PIN */
   const dots=()=>{for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('on',i<pin.length);};
-  function openPin(){pin='';dots();document.getElementById('ap-pe').textContent='';document.getElementById('ap-pin').classList.add('open');}
- window._N=n=>{
-    if(pin.length>=4)return; pin+=n; dots();
-    if(pin.length===4){
-      if(pin===PIN){
-        document.getElementById('ap-pin').classList.remove('open');
-        if(window._quickMode){
-          sessionStorage.setItem('be_auth_ok','1');
-          document.body.classList.add('be-admin-active');
-          if(!prods.length&&typeof load==='function')load();
-        } else {
-          openPanel();
-        }
+ function openPin(){pin='';dots();document.getElementById('ap-pe').textContent='';document.getElementById('ap-pin').classList.add('open');}
+window._N=n=>{
+  if(pin.length>=4)return; pin+=n; dots();
+  if(pin.length===4){
+    if(pin===PIN){
+      document.getElementById('ap-pin').classList.remove('open');
+      if(window._quickMode){
+        sessionStorage.setItem('be_auth_ok','1');
+        document.body.classList.add('be-admin-active');
+        if(!prods.length&&typeof load==='function')load();
       } else {
-        document.getElementById('ap-pe').textContent='PIN incorrecto';
-        setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);
+        openPanel();
       }
+    } else {
+      document.getElementById('ap-pe').textContent='PIN incorrecto';
+      setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);
     }
-  };
+  }
+};
+window._D=()=>{pin=pin.slice(0,-1);dots();};
+
+/* Disparador de 3 clics para el lapicito */
+let lapizClicks = 0, lapizTimer = null;
+window._LapizTripleClic = function() {
+  lapizClicks++;
+  clearTimeout(lapizTimer);
+  lapizTimer = setTimeout(() => { lapizClicks = 0; }, 700);
+  if (lapizClicks >= 3) {
+    lapizClicks = 0;
+    window._quickMode = true;
+    openPin();
+  }
+};
         /* Lógica de edición directa desde el lapicito */
   window._quickMode = false;
 
@@ -581,12 +591,6 @@ select.ain option{background:#2A1020;color:#fff;}
       }
     }
   }, true);
-      else{document.getElementById('ap-pe').textContent='PIN incorrecto';
-        setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);}
-    }
-  };
-  window._D=()=>{pin=pin.slice(0,-1);dots();};
-
   /* Panel */
   function openPanel(){document.getElementById('ap').classList.add('open');updateStatus();if(!prods.length)load();}
   window._ClosePanel=()=>{document.getElementById('ap').classList.remove('open');document.getElementById('af').classList.remove('open');};
