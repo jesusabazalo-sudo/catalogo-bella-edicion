@@ -642,21 +642,19 @@ body {
 .admin-quick-btn {
   background: transparent !important;
   border: none !important;
-  font-size: 15px !important;
-  cursor: pointer !important;
-  opacity: 0.15; /* Muy tenue para clientes */
-  transition: opacity 0.2s, transform 0.2s !important;
-  padding: 8px !important;
-  margin-left: 10px !important;
+  font-size: 10px !important;
+  cursor: default !important;
+  opacity: 0.02 !important;
+  transition: opacity 0.25s !important;
+  padding: 4px 6px !important;
+  margin-left: 8px !important;
   line-height: 1 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  user-select: none !important;
 }
 
 .admin-quick-btn:hover {
-  opacity: 0.9 !important;
-  transform: scale(1.15) !important;
+  opacity: 0.45 !important;
+  cursor: pointer !important;
 }
 
 /* 2. Barra flotante cuando el modo edición está activo */
