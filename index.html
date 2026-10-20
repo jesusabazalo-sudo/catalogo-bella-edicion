@@ -83,7 +83,7 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-  <div class="brand">
+    <div class="brand">
       <div class="brand-mark">
         <div class="brand-mark-ring"></div>
         <span class="brand-mark-be">BE</span>
@@ -223,7 +223,7 @@ setTimeout(function(){
 
 <!-- ══════════════════════════════════════
      PANEL ADMIN — BELLA EDICIÓN
-     Triple clic en © del footer
+     Triple clic en © del footer o en el lápiz superior
      PIN: 2412
 ══════════════════════════════════════ -->
 <style>
@@ -288,14 +288,14 @@ setTimeout(function(){
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .acm{color:#888;font-size:9px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:1px;}
 .acp{color:#C9A24B;font-size:12.5px;font-family:'Cormorant Garamond',serif;}
-/* Form */
-#af{display:none;position:absolute;inset:0;z-index:10;background:#0C0308;flex-direction:column;overflow:hidden;}
+/* Form (fijo en pantalla para abrirse tanto en catálogo como en panel) */
+#af{display:none;position:fixed;inset:0;z-index:100000;background:#0C0308;flex-direction:column;overflow:hidden;}
 #af.open{display:flex;}
 .afh{background:#180810;border-bottom:1px solid rgba(201,162,75,.18);
   padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .abk{background:none;border:none;color:#C9A24B;font-size:22px;cursor:pointer;padding:2px 6px;line-height:1;}
 .aft{color:#fff;font-size:13px;font-family:'Jost',sans-serif;flex:1;}
-.afb{flex:1;overflow-y:auto;padding:16px;}
+.afb{flex:1;overflow-y:auto;padding:16px;max-width:680px;width:100%;margin:0 auto;box-sizing:border-box;}
 .air{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;}
 .aip{width:115px;height:115px;object-fit:contain;background:#1A0810;
   border-radius:10px;border:1px solid rgba(255,255,255,.1);padding:5px;flex-shrink:0;}
@@ -395,58 +395,59 @@ select.ain option{background:#2A1020;color:#fff;}
     <select class="act" id="act"><option value="">Todas las categorías</option></select>
   </div>
   <div class="agw"><div class="agr" id="agr"></div></div>
+</div>
 
-  <!-- Formulario -->
-  <div id="af">
-    <div class="afh">
-      <button class="abk" onclick="_BackList()">←</button>
-      <span class="aft" id="aft">Editar producto</span>
-    </div>
-    <div class="afb">
-      <div class="air">
-        <img class="aip" id="aip" src="" alt="">
-        <div class="ais">
-          <label class="aul" for="afi">📷 Cambiar foto</label>
-          <input class="afi" type="file" id="afi" accept="image/*">
-          <div class="aio" id="aio">✓ Foto nueva lista</div>
-        </div>
+<!-- Formulario de edición (independiente para funcionar sobre el catálogo y en el panel) -->
+<div id="af">
+  <div class="afh">
+    <button class="abk" onclick="_BackList()">←</button>
+    <span class="aft" id="aft">Editar producto</span>
+  </div>
+  <div class="afb">
+    <div class="air">
+      <img class="aip" id="aip" src="" alt="">
+      <div class="ais">
+        <label class="aul" for="afi">📷 Cambiar foto</label>
+        <input class="afi" type="file" id="afi" accept="image/*">
+        <div class="aio" id="aio">✓ Foto nueva lista</div>
       </div>
-
-      <!-- Toggle AGOTADO -->
-      <label class="atog">
-        <input type="checkbox" id="f-agt">
-        <div>
-          <div class="atog-lbl">Marcar como Agotado</div>
-          <div class="atog-sub">El producto se verá gris con "Sin stock" en el catálogo</div>
-        </div>
-      </label>
-
-      <label class="afl">Nombre del producto</label>
-      <input class="ain" id="fn" type="text" placeholder="Nombre completo...">
-      <label class="afl">Marca</label>
-      <input class="ain" id="fm" type="text" placeholder="Ej: Natura, L'Bel, Ésika...">
-      <label class="afl">Categoría</label>
-      <select class="ain" id="fc">
-        <option>Perfumes mujer</option><option>Perfumes hombre</option>
-        <option>Perfumes unisex</option><option>Cuidado facial</option>
-        <option>Cuidado corporal</option><option>Cuidado personal</option>
-        <option>Cuidado del cabello</option><option>Accesorios</option>
-      </select>
-      <label class="afl">Presentación</label>
-      <input class="ain" id="fp" type="text" placeholder="Ej: 50 ml, 100g...">
-      <div class="apr">
-        <div>
-          <label class="afl">Precio tachado (S/)</label>
-          <input class="ain" id="fa" type="number" step="0.1" min="0">
-        </div>
-        <div>
-          <label class="afl">Precio actual (S/)</label>
-          <input class="ain" id="fpr" type="number" step="0.1" min="0">
-        </div>
-      </div>
-      <button class="asv idle" id="asv" onclick="_Guardar()">✓ Guardar producto</button>
-      <div class="asm" id="asm"></div>
     </div>
+
+    <!-- Toggle AGOTADO -->
+    <label class="atog">
+      <input type="checkbox" id="f-agt">
+      <div>
+        <div class="atog-lbl">Marcar como Agotado</div>
+        <div class="atog-sub">El producto se verá gris con "Sin stock" en el catálogo</div>
+      </div>
+    </label>
+
+    <label class="afl">Nombre del producto</label>
+    <input class="ain" id="fn" type="text" placeholder="Nombre completo...">
+    <label class="afl">Marca</label>
+    <input class="ain" id="fm" type="text" placeholder="Ej: Natura, L'Bel, Ésika...">
+    <label class="afl">Categoría</label>
+    <select class="ain" id="fc">
+      <option>Perfumes mujer</option><option>Perfumes hombre</option>
+      <option>Perfumes unisex</option><option>Cuidado facial</option>
+      <option>Cuidado corporal</option><option>Cuidado personal</option>
+      <option>Cuidado del cabello</option><option>Accesorios</option>
+      <option>Cosméticos</option>
+    </select>
+    <label class="afl">Presentación</label>
+    <input class="ain" id="fp" type="text" placeholder="Ej: 50 ml, 100g...">
+    <div class="apr">
+      <div>
+        <label class="afl">Precio tachado (S/)</label>
+        <input class="ain" id="fa" type="number" step="0.1" min="0">
+      </div>
+      <div>
+        <label class="afl">Precio actual (S/)</label>
+        <input class="ain" id="fpr" type="number" step="0.1" min="0">
+      </div>
+    </div>
+    <button class="asv idle" id="asv" onclick="_Guardar()">✓ Guardar producto</button>
+    <div class="asm" id="asm"></div>
   </div>
 </div>
 
@@ -488,118 +489,115 @@ select.ain option{background:#2A1020;color:#fff;}
     else{st.className='a-status no';st.textContent='⚪ Sin GitHub';}
   }
 
-  /* Trigger triple clic */
+  /* Trigger triple clic en footer */
   document.getElementById('be-trig').addEventListener('click',function(){
     clicks++; clearTimeout(ct);
     ct=setTimeout(()=>{clicks=0;},700);
-    if(clicks>=3){clicks=0;openPin();}
+    if(clicks>=3){clicks=0;window._quickMode=false;openPin();}
   });
 
-  /* PIN */
+  /* PIN (siempre solicita la contraseña 2412) */
   const dots=()=>{for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('on',i<pin.length);};
- function openPin(){pin='';dots();document.getElementById('ap-pe').textContent='';document.getElementById('ap-pin').classList.add('open');}
-window._N=n=>{
-  if(pin.length>=4)return; pin+=n; dots();
-  if(pin.length===4){
-    if(pin===PIN){
-      document.getElementById('ap-pin').classList.remove('open');
-      if(window._quickMode){
-        sessionStorage.setItem('be_auth_ok','1');
-        document.body.classList.add('be-admin-active');
-        if(!prods.length&&typeof load==='function')load();
+  function openPin(){
+    pin='';
+    dots();
+    document.getElementById('ap-pe').textContent='';
+    document.getElementById('ap-pin').classList.add('open');
+  }
+  window._N=n=>{
+    if(pin.length>=4)return;
+    pin+=n;
+    dots();
+    if(pin.length===4){
+      if(pin===PIN){
+        document.getElementById('ap-pin').classList.remove('open');
+        if(window._quickMode){
+          window._quickMode=false;
+          document.body.classList.add('be-admin-active');
+          if(!prods.length&&typeof load==='function')load();
+        } else {
+          openPanel();
+        }
       } else {
-        openPanel();
+        document.getElementById('ap-pe').textContent='PIN incorrecto';
+        setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);
       }
-    } else {
-      document.getElementById('ap-pe').textContent='PIN incorrecto';
-      setTimeout(()=>{pin='';dots();document.getElementById('ap-pe').textContent='';},900);
     }
-  }
-};
-window._D=()=>{pin=pin.slice(0,-1);dots();};
+  };
+  window._D=()=>{pin=pin.slice(0,-1);dots();};
 
-/* Disparador de 3 clics para el lapicito */
-let lapizClicks = 0, lapizTimer = null;
-window._LapizTripleClic = function() {
-  lapizClicks++;
-  clearTimeout(lapizTimer);
-  lapizTimer = setTimeout(() => { lapizClicks = 0; }, 700);
-  if (lapizClicks >= 3) {
-    lapizClicks = 0;
-    window._quickMode = true;
-    openPin();
-  }
-};
-        /* Lógica de edición directa desde el lapicito */
+  /* Disparador de 3 clics seguidos para el lapicito de la cabecera */
   window._quickMode = false;
+  let lapizClicks = 0, lapizTimer = null;
+  window._LapizTripleClic = function() {
+    lapizClicks++;
+    clearTimeout(lapizTimer);
+    lapizTimer = setTimeout(() => { lapizClicks = 0; }, 700);
+    if (lapizClicks >= 3) {
+      lapizClicks = 0;
+      if (document.body.classList.contains('be-admin-active')) {
+        document.body.classList.remove('be-admin-active');
+        return;
+      }
+      window._quickMode = true;
+      openPin();
+    }
+  };
 
-  // Barra flotante de control
+  /* Barra flotante de control en Modo Edición */
   const bar = document.createElement('div');
   bar.className = 'be-admin-bar';
   bar.innerHTML = `
     <span>🛠️ Modo Edición Activo</span>
     <button id="btnNewQuick">+ Nuevo producto</button>
+    <button id="btnCfgQuick">⚙ GitHub</button>
     <button id="btnExitQuick">✕ Salir</button>
   `;
   document.body.appendChild(bar);
 
-  // Clic en el lapicito de la cabecera
-  const qBtn = document.getElementById('adminQuickBtn');
-  if (qBtn) {
-    qBtn.addEventListener('click', () => {
-      if (document.body.classList.contains('be-admin-active')) {
-        document.body.classList.remove('be-admin-active');
-        return;
-      }
-      if (sessionStorage.getItem('be_auth_ok') === '1') {
-        document.body.classList.add('be-admin-active');
-        if (!prods.length && typeof load === 'function') load();
-      } else {
-        window._quickMode = true;
-        openPin();
-      }
-    });
-  }
-
-  // Botón Nuevo producto de la barra flotante
-  document.getElementById('btnNewQuick').addEventListener('click', () => {
-    isNew = true; curId = null;
-    if (typeof openForm === 'function') openForm();
-    else if (typeof _New === 'function') _New();
-    else document.getElementById('af').classList.add('open');
+  document.getElementById('btnNewQuick').addEventListener('click', async () => {
+    if (!prods.length && typeof load === 'function') await load();
+    window._Nuevo();
   });
 
-  // Botón Salir de la barra flotante
+  document.getElementById('btnCfgQuick').addEventListener('click', () => {
+    window._OpenCfg();
+  });
+
   document.getElementById('btnExitQuick').addEventListener('click', () => {
     document.body.classList.remove('be-admin-active');
+    document.getElementById('af').classList.remove('open');
   });
 
-  // Clic directo en cualquier tarjeta para editarla
-  document.addEventListener('click', e => {
+  /* Clic directo en cualquier tarjeta del catálogo para editarla */
+  document.addEventListener('click', async e => {
     if (!document.body.classList.contains('be-admin-active')) return;
     const card = e.target.closest('.card');
     if (card) {
+      e.preventDefault();
+      e.stopPropagation();
       const id = parseInt(card.dataset.id || card.getAttribute('data-id'));
-      if (id && typeof window._Edit === 'function') {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!prods.length && typeof load === 'function') {
-          load().then(() => window._Edit(id));
-        } else {
-          window._Edit(id);
-        }
+      if (!id) return;
+      if (!prods.length && typeof load === 'function') {
+        await load();
       }
+      window._Edit(id);
     }
   }, true);
+
   /* Panel */
   function openPanel(){document.getElementById('ap').classList.add('open');updateStatus();if(!prods.length)load();}
   window._ClosePanel=()=>{document.getElementById('ap').classList.remove('open');document.getElementById('af').classList.remove('open');};
 
   /* Cargar productos */
   async function load(){
-    document.getElementById('agr').innerHTML='<p style="color:#888;padding:40px;text-align:center;grid-column:1/-1">⏳ Cargando...</p>';
+    const agrEl=document.getElementById('agr');
+    if(agrEl)agrEl.innerHTML='<p style="color:#888;padding:40px;text-align:center;grid-column:1/-1">⏳ Cargando...</p>';
     try{prods=await(await fetch(RAW+'?v='+Date.now())).json();buildCats();renderGrid();}
-    catch{document.getElementById('agr').innerHTML='<p style="color:#F87;padding:40px;text-align:center;grid-column:1/-1">❌ Error de conexión</p>';}
+    catch{
+      try{prods=await(await fetch('products.json?v='+Date.now())).json();buildCats();renderGrid();}
+      catch{if(agrEl)agrEl.innerHTML='<p style="color:#F87;padding:40px;text-align:center;grid-column:1/-1">❌ Error de conexión</p>';}
+    }
   }
 
   function buildCats(){
@@ -639,12 +637,19 @@ window._LapizTripleClic = function() {
   window._Edit=id=>{
     isNew=false; curId=id;
     const p=prods.find(x=>x.id===id);
+    if(!p)return;
     document.getElementById('aft').textContent=p.nombre.substring(0,38);
     document.getElementById('aip').src=imgStore[id]?imgStore[id].url:p.imagen;
     document.getElementById('f-agt').checked=p.disponible===false;
     document.getElementById('fn').value=p.nombre;
     document.getElementById('fm').value=p.marca;
-    document.getElementById('fc').value=p.categoria_web;
+    const fcEl=document.getElementById('fc');
+    if(![...fcEl.options].some(o=>o.value===p.categoria_web)){
+      const opt=document.createElement('option');
+      opt.value=p.categoria_web; opt.textContent=p.categoria_web;
+      fcEl.appendChild(opt);
+    }
+    fcEl.value=p.categoria_web;
     document.getElementById('fp').value=p.presentacion||'';
     document.getElementById('fa').value=p.precio_antes;
     document.getElementById('fpr').value=p.precio;
@@ -658,7 +663,7 @@ window._LapizTripleClic = function() {
 
   /* Nuevo */
   window._Nuevo=()=>{
-    isNew=true; curId=Math.max(...prods.map(p=>p.id))+1;
+    isNew=true; curId=prods.length?Math.max(...prods.map(p=>p.id))+1:1;
     document.getElementById('aft').textContent='Nuevo producto (ID '+curId+')';
     document.getElementById('aip').src='';
     document.getElementById('f-agt').checked=false;
@@ -689,6 +694,38 @@ window._LapizTripleClic = function() {
 
   function setSvIdle(){const b=document.getElementById('asv');b.className='asv idle';b.textContent='✓ Guardar producto';b.disabled=false;}
 
+  /* Actualizar visualmente la tarjeta del catálogo público al instante */
+  function syncPublicCard(id, data){
+    const domCard=document.querySelector(`.card[data-id="${id}"]`);
+    if(domCard){
+      const bEl=domCard.querySelector('.card-brand'); if(bEl)bEl.textContent=data.marca;
+      const nEl=domCard.querySelector('.card-name'); if(nEl)nEl.textContent=data.nombre;
+      const pEl=domCard.querySelector('.card-pres'); if(pEl)pEl.textContent=data.presentacion||'';
+      const pnEl=domCard.querySelector('.price-now'); if(pnEl)pnEl.textContent='S/'+data.precio;
+      const pbEl=domCard.querySelector('.price-before'); if(pbEl&&!isNaN(data.precio_antes))pbEl.textContent='S/'+data.precio_antes;
+      const imgEl=domCard.querySelector('.card-img-wrap img');
+      if(imgEl&&imgStore[id])imgEl.src=imgStore[id].url;
+      const addBtn=domCard.querySelector('.add-btn');
+      const badgesEl=domCard.querySelector('.badges');
+      if(!data.disponible){
+        domCard.classList.add('agotado');
+        if(addBtn){addBtn.disabled=true;addBtn.textContent='Sin stock';}
+        if(badgesEl&&!badgesEl.querySelector('.badge-agotado, .agotado')){
+          badgesEl.insertAdjacentHTML('afterbegin','<span class="badge agotado">Agotado</span>');
+        }
+      } else {
+        domCard.classList.remove('agotado');
+        if(addBtn){addBtn.disabled=false;addBtn.textContent='Agregar a mi lista';addBtn.removeAttribute('style');}
+        if(badgesEl)badgesEl.querySelectorAll('.badge-agotado, .agotado').forEach(el=>el.remove());
+      }
+    }
+    if(typeof PRODUCTS!=='undefined'&&Array.isArray(PRODUCTS)){
+      const idx=PRODUCTS.findIndex(x=>x.id===id);
+      if(idx!==-1)Object.assign(PRODUCTS[idx],data);
+      else if(isNew)PRODUCTS.push(data);
+    }
+  }
+
   /* ── GUARDAR — el core de todo ── */
   window._Guardar=async()=>{
     const nombre=document.getElementById('fn').value.trim();
@@ -705,23 +742,27 @@ window._LapizTripleClic = function() {
     if(!nombre){msg.textContent='⚠ Escribe el nombre';msg.className='asm er';return;}
     if(isNaN(precio)||precio<=0){msg.textContent='⚠ El precio debe ser mayor a 0';msg.className='asm er';return;}
 
+    let updatedItem;
     /* Aplicar cambios al array local */
     if(isNew){
-      prods.push({
+      updatedItem={
         id:curId,nombre,marca,categoria_web:cat,categoria_original:cat,
         subcategoria:'',publico:'',presentacion:pres,estado_empaque:'Cerrado',
         precio_antes:isNaN(antes)?Math.round(precio*1.2):antes,precio,precio_abierto:0,
         descripcion:'',notas:'',imagen:`images/item${curId}.jpg`,
         disponible:!agotado,destacado:false,oferta:false,nuevo:true
-      });
+      };
+      prods.push(updatedItem);
     } else {
       const p=prods.find(x=>x.id===curId);
       p.nombre=nombre; p.marca=marca; p.categoria_web=cat; p.presentacion=pres;
       if(!isNaN(antes))p.precio_antes=antes;
       p.precio=precio;
       p.disponible=!agotado;
+      updatedItem=p;
     }
     modified.add(curId);
+    syncPublicCard(curId,updatedItem);
 
     /* Si no hay token, guardar solo en memoria y mostrar descarga */
     if(!tk()){
