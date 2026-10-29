@@ -211,7 +211,7 @@
   },
   {
     "id": 13,
-    "nombre": "Natura Tododia Iluminador Corporal Acerola e Hibisco",
+    "nombre": "Natura Tododia Bronzer Iluminador Corporal Acerola e Hibisco",
     "marca": "Natura",
     "categoria_web": "Cuidado corporal",
     "categoria_original": "Cuidado corporal",
@@ -220,7 +220,7 @@
     "presentacion": "150 ml",
     "estado_empaque": "Cerrado",
     "precio_antes": 70,
-    "precio": 39,
+    "precio": 39.9,
     "precio_abierto": 40,
     "descripcion": "Iluminador corporal con aroma de acerola e hibisco para aportar brillo sutil a la piel.",
     "notas": null,
