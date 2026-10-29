@@ -711,7 +711,7 @@
     "destacado": true,
     "oferta": true,
     "nuevo": false,
-    "disponible": true
+    "disponible": false
   },
   {
     "id": 38,
