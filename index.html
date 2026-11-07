@@ -179,6 +179,8 @@
 .ab.add:hover{background:rgba(45,120,60,.35);}
 .ab.cfg{background:rgba(201,162,75,.1);border-color:rgba(201,162,75,.3);color:#C9A24B;}
 .ab.cfg:hover{background:rgba(201,162,75,.2);}
+.be-admin-active .card{cursor:grab;}.be-admin-active .card.sortable-chosen{outline:2px solid #C9A24B;}.be-admin-active .card.sortable-ghost{opacity:.35;}
+#btnOrdQuick{background:linear-gradient(135deg,#9B7B1A,#C9A24B)!important;color:#1E0810!important;font-weight:600;}
 .ab.ord{background:linear-gradient(135deg,#9B7B1A,#C9A24B);border-color:#E0C27A;color:#1E0810;font-weight:600;}
 .a-hint{color:#C9A24B;font-size:11.5px;font-family:'Jost',sans-serif;margin:0 0 10px;opacity:.85;}
 .ac.sortable-ghost{opacity:.3;}.ac.sortable-chosen{border-color:#C9A24B;box-shadow:0 0 0 2px #C9A24B;}
@@ -308,7 +310,7 @@ select.ain option{background:#2A1020;color:#fff;}
     <h1>✦ Admin Bella Edición</h1>
     <span class="a-status no" id="a-st">⚪ Sin GitHub</span>
     <button class="ab add" onclick="_Nuevo()">➕ Nuevo</button>
-    <button class="ab ord" id="a-ord" onclick="_GuardarOrden()" hidden>💾 Guardar orden</button>
+    <button class="ab ord ord-btn" id="a-ord" onclick="_GuardarOrden()" hidden>💾 Guardar orden</button>
     <button class="ab cfg" onclick="_OpenCfg()">⚙ Config</button>
     <button class="ab cls" onclick="_ClosePanel()">✕ Salir</button>
   </div>
@@ -472,6 +474,8 @@ select.ain option{background:#2A1020;color:#fff;}
   bar.innerHTML = `
     <span>🛠️ Modo Edición Activo</span>
     <button id="btnNewQuick">+ Nuevo producto</button>
+    <button id="btnPanelQuick">📋 Panel completo</button>
+    <button id="btnOrdQuick" class="ord-btn" onclick="_GuardarOrden()" hidden>💾 Guardar orden</button>
     <button id="btnCfgQuick">⚙ GitHub</button>
     <button id="btnExitQuick">✕ Salir</button>
   `;
@@ -491,10 +495,40 @@ select.ain option{background:#2A1020;color:#fff;}
     document.getElementById('af').classList.remove('open');
   });
 
+  document.getElementById('btnPanelQuick').addEventListener('click', () => {
+    document.getElementById('af').classList.remove('open');
+    openPanel();
+  });
+
+  /* Arrastrar tarjetas en el catálogo para ordenarlas (modo lápiz) */
+  let catSorters=[], justDragged=false;
+  function initCatalogSort(){
+    catSorters.forEach(s=>s.destroy()); catSorters=[];
+    if(!document.body.classList.contains('be-admin-active')||typeof Sortable==='undefined')return;
+    document.querySelectorAll('#homeRows .row-track, #productGrid').forEach(el=>{
+      catSorters.push(Sortable.create(el,{
+        animation:180,delay:180,delayOnTouchOnly:true,draggable:'.card',
+        onStart(){justDragged=true;},
+        async onEnd(ev){
+          setTimeout(()=>{justDragged=false;},250);
+          if(!prods.length) await load();
+          applyOrder([...ev.to.querySelectorAll('.card')].map(c=>+c.dataset.id));
+        }
+      }));
+    });
+  }
+  window._initCatalogSort=initCatalogSort;
+  if(typeof renderGrid==='function'){
+    const _rg=renderGrid;
+    renderGrid=function(){ _rg.apply(this,arguments); initCatalogSort(); };
+  }
+  new MutationObserver(()=>initCatalogSort()).observe(document.body,{attributes:true,attributeFilter:['class']});
+
   /* Clic directo en cualquier tarjeta del catálogo para editarla */
   document.addEventListener('click', async e => {
     if (!document.body.classList.contains('be-admin-active')) return;
     const card = e.target.closest('.card');
+    if (card && justDragged) { e.preventDefault(); e.stopPropagation(); return; }
     if (card) {
       e.preventDefault();
       e.stopPropagation();
@@ -560,26 +594,32 @@ select.ain option{background:#2A1020;color:#fff;}
     if(sorter)sorter.destroy();
     sorter=Sortable.create(document.getElementById('agr'),{
       animation:180,delay:180,delayOnTouchOnly:true,
-      onEnd(){
-        const ids=[...document.querySelectorAll('#agr .ac')].map(el=>+el.dataset.id);
-        const set=new Set(ids);
-        const slots=prods.map((p,i)=>set.has(p.id)?i:-1).filter(i=>i>=0);
-        const byId=Object.fromEntries(prods.map(p=>[p.id,p]));
-        const next=[...prods];
-        slots.forEach((slot,k)=>{next[slot]=byId[ids[k]];});
-        prods=next;
-        document.getElementById('a-ord').hidden=false;
-      }
+      onEnd(){ applyOrder([...document.querySelectorAll('#agr .ac')].map(el=>+el.dataset.id)); }
     });
   }
+  /* Reordena 'prods' (y el catálogo) según la lista de ids arrastrada */
+  function applyOrder(ids){
+    const set=new Set(ids);
+    const slots=prods.map((p,i)=>set.has(p.id)?i:-1).filter(i=>i>=0);
+    const byId=Object.fromEntries(prods.map(p=>[p.id,p]));
+    const next=[...prods];
+    slots.forEach((slot,k)=>{next[slot]=byId[ids[k]];});
+    prods=next;
+    if(typeof PRODUCTS!=='undefined'){
+      const pos=Object.fromEntries(prods.map((p,i)=>[p.id,i]));
+      PRODUCTS.sort((x,y)=>(pos[x.id]??1e9)-(pos[y.id]??1e9));
+    }
+    document.querySelectorAll('.ord-btn').forEach(b=>b.hidden=false);
+  }
   window._GuardarOrden=async()=>{
-    const b=document.getElementById('a-ord');
+    const bs=[...document.querySelectorAll('.ord-btn')];
+    const b={set textContent(v){bs.forEach(x=>x.textContent=v);},set disabled(v){bs.forEach(x=>x.disabled=v);},set hidden(v){bs.forEach(x=>x.hidden=v);}};
     if(!tk()){ofrecerDescarga();alert('Configura GitHub (⚙ Config) para guardar en línea. Se descargó products.json.');return;}
     b.textContent='⏳ Guardando...';b.disabled=true;
     try{
       const cur=await ghGet('products.json');
       await ghPut('products.json',b64(JSON.stringify(prods,null,2)),cur.sha,'Nuevo orden de productos — admin Bella Edición');
-      if(typeof PRODUCTS!=='undefined'){PRODUCTS.length=0;prods.forEach(p=>PRODUCTS.push(p));try{renderGrid();}catch(e){}}
+      if(typeof PRODUCTS!=='undefined'){PRODUCTS.length=0;prods.forEach(p=>PRODUCTS.push(p));}
       b.textContent='✅ Orden guardado';setTimeout(()=>{b.hidden=true;b.textContent='💾 Guardar orden';b.disabled=false;},2500);
     }catch(e){b.textContent='❌ Error, reintenta';b.disabled=false;alert('Error: '+e.message);}
   };
