@@ -35,7 +35,7 @@ function cardHTML(p) {
           ${p.oferta && p.disponible!==false ? '<span class="badge oferta">Oferta</span>' : ""}
           ${p.destacado && p.disponible!==false ? '<span class="badge destacado">Destacado</span>' : ""}
         </div>
-        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
+        <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" decoding="async">
       </div>
       <div class="card-body">
         <span class="card-brand">${p.marca}</span>
@@ -167,6 +167,7 @@ function renderGrid() {
     document.getElementById("emptyState").hidden = true;
     document.getElementById("resultsCount").textContent = "";
     setupCards();
+    setupReveal();
     return;
   }
   home.hidden = true; home.innerHTML = "";
@@ -184,6 +185,7 @@ function renderGrid() {
 
   grid.innerHTML = list.map(cardHTML).join("");
   setupCards();
+  markLoaded(grid);
 }
 
 // === ANIMACIÓN DE ENTRADA EN CASCADA ===
@@ -211,6 +213,17 @@ function setupCards() {
     card.style.setProperty('--cd', `${(i % 4) * 100}ms`);
     window._co.observe(card);
   });
+}
+
+// ===== Animaciones ligeras (solo transform/opacity, sin lag) =====
+document.addEventListener("load", e => { if (e.target.tagName === "IMG") e.target.classList.add("ok"); }, true);
+function markLoaded(root) { (root || document).querySelectorAll(".card-img-wrap img").forEach(i => { if (i.complete && i.naturalWidth) i.classList.add("ok"); }); }
+const revealIO = "IntersectionObserver" in window ? new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); revealIO.unobserve(e.target); } });
+}, { rootMargin: "0px 0px -8% 0px", threshold: 0.06 }) : null;
+function setupReveal() {
+  markLoaded();
+  document.querySelectorAll("#homeRows > section:not(.in)").forEach(s => revealIO ? revealIO.observe(s) : s.classList.add("in"));
 }
 
 // ===================== EVENTS: grid =====================
@@ -269,7 +282,9 @@ function saveCart() { localStorage.setItem("be_cart", JSON.stringify(cart)); }
 function renderCart() {
   const ids = Object.keys(cart);
   const count = ids.reduce((s,id) => s + cart[id], 0);
-  document.getElementById("cartCount").textContent = count;
+  const cc = document.getElementById("cartCount");
+  if (cc.textContent !== String(count)) { cc.classList.remove("bump"); void cc.offsetWidth; cc.classList.add("bump"); }
+  cc.textContent = count;
 
   const itemsWrap = document.getElementById("cartItems");
   const emptyMsg = document.getElementById("cartEmptyMsg");

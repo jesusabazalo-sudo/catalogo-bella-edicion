@@ -314,7 +314,6 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.18);
-  animation: badgeGlow 2.8s ease-in-out infinite;
 }
 .badge::after {
   content: '';
@@ -322,8 +321,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 20px 60px; }
   top: -60%; left: -90%;
   width: 55%; height: 220%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
-  transform: skewX(-22deg);
-  animation: badgeShine 3.8s ease-in-out infinite;
+  transform: translateX(0) skewX(-22deg);
+  opacity: 0;
 }
 .badge.nuevo  { background: var(--bd-nuevo, linear-gradient(135deg,#8B2335,#C13B4D)); animation-delay: 0s; }
 .badge.nuevo::after  { animation-delay: 0s; }
@@ -801,3 +800,43 @@ body.be-admin-active .wa-float{display:none;}
 .site-footer .footer-note{color:#9C8B7E;font-size:12px;}
 #be-footer{background:#1A0A0E;color:#7A6658!important;margin:0;}
 @media(max-width:700px){.brand-list{grid-template-columns:repeat(2,1fr);}.wa-float{width:52px;height:52px;right:14px;bottom:14px;}.row-deal{padding:16px 12px 6px;}}
+
+/* ===== Animaciones premium 0 lag (solo transform y opacity) ===== */
+/* Destello dorado en etiquetas: solo al pasar el mouse, una vez */
+@keyframes beShine{from{transform:translateX(0) skewX(-22deg);opacity:1}to{transform:translateX(420%) skewX(-22deg);opacity:0}}
+.card:hover .badge::after{animation:beShine .9s ease-out 1;}
+/* Secciones del inicio aparecen suavemente al bajar */
+#homeRows>section{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);}
+#homeRows>section.in{opacity:1;transform:none;}
+/* Las filas lejanas no se dibujan hasta acercarse (rendimiento) */
+#homeRows>section.row:not(.row-reco){content-visibility:auto;contain-intrinsic-size:auto 520px;}
+/* Barrido de luz dorada sobre "Recomendados" al aparecer */
+.row-reco{position:relative;overflow:hidden;}
+.row-reco::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(105deg,transparent 35%,rgba(255,236,180,.55) 50%,transparent 65%);transform:translateX(-100%);}
+.row-reco.in::before{animation:beSweep 1.6s .25s ease-out 1 forwards;}
+@keyframes beSweep{to{transform:translateX(100%)}}
+.row-deal{position:relative;overflow:hidden;}
+.row-deal::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 15% 0%,rgba(232,207,138,.18),transparent 55%);}
+/* Imágenes aparecen con fundido al cargar */
+.card-img-wrap img{opacity:0;transition:opacity .45s ease,transform .5s ease;}
+.card-img-wrap img.ok{opacity:1;}
+/* Flechas de las filas aparecen al pasar por la fila (escritorio) */
+@media(hover:hover){.row-arrow{opacity:0;transform:scale(.85);transition:opacity .25s,transform .25s,background .2s;}.row-wrap:hover .row-arrow{opacity:1;transform:none;}}
+.row-track{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;}
+/* Rebote del contador del carrito */
+@keyframes beBump{0%{transform:scale(1)}35%{transform:scale(1.45)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+.cart-count.bump{animation:beBump .5s cubic-bezier(.3,1.6,.5,1);}
+/* Botones de marca con elevación suave */
+.brand-ini{transition:transform .35s cubic-bezier(.3,1.5,.5,1);}
+.brand-chip:hover .brand-ini{transform:scale(1.08) rotate(-4deg);}
+/* WhatsApp flotante: un pulso sutil cada pocos segundos (transform, barato) */
+.wa-float::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 0 rgba(37,211,102,.5);animation:beRing 3.5s ease-out infinite;pointer-events:none;}
+@keyframes beRing{0%,70%{transform:scale(1);opacity:0}75%{opacity:.9;transform:scale(1)}100%{transform:scale(1.6);opacity:0}}
+.wa-float::after{background:rgba(37,211,102,.35);}
+/* Botones con respuesta táctil */
+.add-btn,.row-more,.cat-pill,.brand-chip{-webkit-tap-highlight-color:transparent;}
+.add-btn:active,.row-more:active,.brand-chip:active{transform:scale(.97);}
+/* Celulares: sin desenfoque en la barra (el blur traba al hacer scroll) */
+@media(max-width:900px){.topbar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(251,246,241,.98)!important;}}
+/* Accesibilidad: si el usuario pide menos movimiento, todo quieto */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}#homeRows>section{opacity:1;transform:none;}.card-img-wrap img{opacity:1;}}
