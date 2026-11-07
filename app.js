@@ -87,12 +87,68 @@ let list = [...PRODUCTS];
     case "precio-asc": list.sort((a,b) => a.precio - b.precio); break;
     case "precio-desc": list.sort((a,b) => b.precio - a.precio); break;
     case "nombre": list.sort((a,b) => a.nombre.localeCompare(b.nombre)); break;
-    default: list.sort((a,b) => (b.destacado - a.destacado) || (b.nuevo - a.nuevo));
+    default: break; // orden definido en el admin (arrastrando)
   }
   return list;
 }
 
+// Vista de inicio: carrusel "Recomendados para ti" + una fila por categoría
+function isHome() { return activeCategory === "Todos" && !searchTerm.trim() && sortMode === "destacado"; }
+function rowHTML(title, items, cat, extra) {
+  if (!items.length) return "";
+  return `<section class="row${extra ? " " + extra : ""}">
+    <div class="row-head">
+      <h2>${title}</h2>
+      ${cat ? `<button class="row-more" data-cat="${cat}">Ver todo <span>→</span></button>` : ""}
+    </div>
+    <div class="row-wrap">
+      <button class="row-arrow prev" aria-label="Anterior">‹</button>
+      <div class="row-track">${items.map(cardHTML).join("")}</div>
+      <button class="row-arrow next" aria-label="Siguiente">›</button>
+    </div>
+  </section>`;
+}
+function renderHome() {
+  const avail = PRODUCTS.filter(p => p.disponible !== false);
+  let reco = avail.filter(p => p.destacado || p.nuevo);
+  if (reco.length < 8) reco = reco.concat(avail.filter(p => !reco.includes(p))).slice(0, 8);
+  let html = rowHTML("Recomendados para ti", reco.slice(0, 16), "", "row-reco");
+  [...new Set(avail.map(p => p.categoria_web))].forEach(c => {
+    html += rowHTML(c, avail.filter(p => p.categoria_web === c), c);
+  });
+  return html;
+}
+function selectCategory(c) {
+  activeCategory = c;
+  document.querySelectorAll("#catNav .cat-pill").forEach(b => b.classList.toggle("active", b.dataset.cat === c));
+  renderGrid();
+  document.querySelector("main").scrollIntoView({ behavior: "smooth" });
+}
+document.addEventListener("click", e => {
+  const more = e.target.closest(".row-more");
+  if (more) { selectCategory(more.dataset.cat); return; }
+  const arrow = e.target.closest(".row-arrow");
+  if (arrow) {
+    const t = arrow.parentElement.querySelector(".row-track");
+    t.scrollBy({ left: (arrow.classList.contains("next") ? 1 : -1) * t.clientWidth * 0.85, behavior: "smooth" });
+  }
+});
+
 function renderGrid() {
+  const home = document.getElementById("homeRows") || (() => {
+    const d = document.createElement("div"); d.id = "homeRows";
+    d.addEventListener("click", handleCardClick);
+    document.getElementById("productGrid").before(d); return d;
+  })();
+  if (isHome()) {
+    home.innerHTML = renderHome(); home.hidden = false;
+    document.getElementById("productGrid").innerHTML = "";
+    document.getElementById("emptyState").hidden = true;
+    document.getElementById("resultsCount").textContent = "";
+    setupCards();
+    return;
+  }
+  home.hidden = true; home.innerHTML = "";
   const list = getFiltered();
   const grid = document.getElementById("productGrid");
   const empty = document.getElementById("emptyState");

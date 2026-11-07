@@ -110,6 +110,7 @@
 </div><!-- /main-content -->
 
 <script src="app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 
 <!-- Paleta de badges según día de la semana -->
 <script>
@@ -178,6 +179,9 @@
 .ab.add:hover{background:rgba(45,120,60,.35);}
 .ab.cfg{background:rgba(201,162,75,.1);border-color:rgba(201,162,75,.3);color:#C9A24B;}
 .ab.cfg:hover{background:rgba(201,162,75,.2);}
+.ab.ord{background:linear-gradient(135deg,#9B7B1A,#C9A24B);border-color:#E0C27A;color:#1E0810;font-weight:600;}
+.a-hint{color:#C9A24B;font-size:11.5px;font-family:'Jost',sans-serif;margin:0 0 10px;opacity:.85;}
+.ac.sortable-ghost{opacity:.3;}.ac.sortable-chosen{border-color:#C9A24B;box-shadow:0 0 0 2px #C9A24B;}
 .ab.cls{background:rgba(139,35,53,.18);border-color:rgba(139,35,53,.35);color:#FF9090;}
 .ab.cls:hover{background:rgba(139,35,53,.35);}
 /* Toolbar */
@@ -304,6 +308,7 @@ select.ain option{background:#2A1020;color:#fff;}
     <h1>✦ Admin Bella Edición</h1>
     <span class="a-status no" id="a-st">⚪ Sin GitHub</span>
     <button class="ab add" onclick="_Nuevo()">➕ Nuevo</button>
+    <button class="ab ord" id="a-ord" onclick="_GuardarOrden()" hidden>💾 Guardar orden</button>
     <button class="ab cfg" onclick="_OpenCfg()">⚙ Config</button>
     <button class="ab cls" onclick="_ClosePanel()">✕ Salir</button>
   </div>
@@ -311,7 +316,7 @@ select.ain option{background:#2A1020;color:#fff;}
     <input class="asr" id="asr" placeholder="🔍 Buscar producto...">
     <select class="act" id="act"><option value="">Todas las categorías</option></select>
   </div>
-  <div class="agw"><div class="agr" id="agr"></div></div>
+  <div class="agw"><p class="a-hint">✋ Mantén presionado y arrastra un producto para cambiar su lugar en la página. Luego toca "Guardar orden".</p><div class="agr" id="agr"></div></div>
 </div>
 
 <!-- Formulario de edición (independiente para funcionar sobre el catálogo y en el panel) -->
@@ -536,7 +541,7 @@ select.ain option{background:#2A1020;color:#fff;}
     g.innerHTML=list.map(p=>{
       const img=imgStore[p.id]?imgStore[p.id].url:p.imagen;
       const agt=p.disponible===false;
-      return `<div class="ac${modified.has(p.id)?' mod':''}${agt?' agt':''}" onclick="_Edit(${p.id})">
+      return `<div class="ac${modified.has(p.id)?' mod':''}${agt?' agt':''}" data-id="${p.id}" onclick="_Edit(${p.id})">
         <img src="${img}" alt="" onerror="this.style.opacity='.2'">
         <div class="aci">
           <div class="acm">${p.marca}</div>
@@ -545,7 +550,39 @@ select.ain option{background:#2A1020;color:#fff;}
         </div>
       </div>`;
     }).join('');
+    initSort();
   }
+
+  /* Ordenar arrastrando (se guarda en GitHub con "Guardar orden") */
+  let sorter=null;
+  function initSort(){
+    if(typeof Sortable==='undefined')return;
+    if(sorter)sorter.destroy();
+    sorter=Sortable.create(document.getElementById('agr'),{
+      animation:180,delay:180,delayOnTouchOnly:true,
+      onEnd(){
+        const ids=[...document.querySelectorAll('#agr .ac')].map(el=>+el.dataset.id);
+        const set=new Set(ids);
+        const slots=prods.map((p,i)=>set.has(p.id)?i:-1).filter(i=>i>=0);
+        const byId=Object.fromEntries(prods.map(p=>[p.id,p]));
+        const next=[...prods];
+        slots.forEach((slot,k)=>{next[slot]=byId[ids[k]];});
+        prods=next;
+        document.getElementById('a-ord').hidden=false;
+      }
+    });
+  }
+  window._GuardarOrden=async()=>{
+    const b=document.getElementById('a-ord');
+    if(!tk()){ofrecerDescarga();alert('Configura GitHub (⚙ Config) para guardar en línea. Se descargó products.json.');return;}
+    b.textContent='⏳ Guardando...';b.disabled=true;
+    try{
+      const cur=await ghGet('products.json');
+      await ghPut('products.json',b64(JSON.stringify(prods,null,2)),cur.sha,'Nuevo orden de productos — admin Bella Edición');
+      if(typeof PRODUCTS!=='undefined'){PRODUCTS.length=0;prods.forEach(p=>PRODUCTS.push(p));try{renderGrid();}catch(e){}}
+      b.textContent='✅ Orden guardado';setTimeout(()=>{b.hidden=true;b.textContent='💾 Guardar orden';b.disabled=false;},2500);
+    }catch(e){b.textContent='❌ Error, reintenta';b.disabled=false;alert('Error: '+e.message);}
+  };
 
   document.getElementById('asr').addEventListener('input',renderGrid);
   document.getElementById('act').addEventListener('change',renderGrid);
