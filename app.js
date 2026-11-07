@@ -11,7 +11,6 @@ let cart = JSON.parse(localStorage.getItem("be_cart") || "{}"); // { id: qty }
 let activeCategory = "Todos";
 let searchTerm = "";
 let sortMode = "destacado";
-let estado = "sellado"; // sellado | abierto
 
 // ===================== INIT =====================
 fetch("products.json")
@@ -43,19 +42,20 @@ function cardHTML(p) {
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
         </div>
-        <button class="add-btn" data-action="add" data-id="${p.id}" ${p.disponible===false?'disabled style="background:#9B9B9B;cursor:not-allowed"':''}>
-          ${p.disponible===false ? 'Sin stock' : 'Agregar a mi lista'}
-        </button>
+        ${p.disponible===false
+          ? `<button class="add-btn pedir-btn" data-action="pedir" data-id="${p.id}">Sin stock · Pedir por WhatsApp</button>`
+          : `<button class="add-btn" data-action="add" data-id="${p.id}">Agregar a mi lista</button>`}
       </div>
     </div>
   `;
 }
 
 function buildCategoryNav() {
-  const cats = ["Todos", ...new Set(PRODUCTS.map(p => p.categoria_web))];
+  const cats = ["Todos", ...new Set(PRODUCTS.filter(p => p.disponible !== false).map(p => p.categoria_web))];
+  if (PRODUCTS.some(p => p.disponible === false)) cats.push("Agotados");
   const nav = document.getElementById("catNav");
   nav.innerHTML = cats.map(c =>
-    `<button class="cat-pill${c === activeCategory ? " active" : ""}" data-cat="${c}">${c}</button>`
+    `<button class="cat-pill${c === "Agotados" ? " cat-agotados" : ""}${c === activeCategory ? " active" : ""}" data-cat="${c}">${c}</button>`
   ).join("");
   nav.querySelectorAll(".cat-pill").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -69,7 +69,12 @@ function buildCategoryNav() {
 // ===================== GRID =====================
 function getFiltered() {
 let list = [...PRODUCTS];
-  if (activeCategory !== "Todos") list = list.filter(p => p.categoria_web === activeCategory);
+  if (activeCategory === "Agotados") list = list.filter(p => p.disponible === false);
+  else {
+    // los agotados solo salen en su sección (o al buscarlos por nombre)
+    if (!searchTerm.trim()) list = list.filter(p => p.disponible !== false);
+    if (activeCategory !== "Todos") list = list.filter(p => p.categoria_web === activeCategory);
+  }
   if (searchTerm.trim()) {
     const q = searchTerm.toLowerCase();
     list = list.filter(p =>
@@ -140,6 +145,8 @@ function handleCardClick(e) {
     setTimeout(() => { addBtn.textContent = "Agregar a mi lista"; addBtn.classList.remove("added"); }, 1100);
     return;
   }
+  const pedirBtn = e.target.closest('[data-action="pedir"]');
+  if (pedirBtn) { pedirAgotado(pedirBtn.dataset.id); return; }
   const imgWrap = e.target.closest('[data-action="open-modal"]');
   if (imgWrap) openModal(imgWrap.dataset.id);
 }
@@ -153,6 +160,13 @@ document.getElementById("sortSelect").addEventListener("change", e => {
   sortMode = e.target.value;
   renderGrid();
 });
+
+function pedirAgotado(id) {
+  const p = PRODUCTS.find(x => String(x.id) === String(id));
+  if (!p) return;
+  const text = encodeURIComponent(`Hola! Me interesa ${p.nombre} (${p.marca}), que figura agotado. ¿Me avisan cuando llegue o puedo pedirlo?`);
+  window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${text}`, "_blank");
+}
 
 // ===================== CART =====================
 function addToCart(id) {
@@ -196,7 +210,7 @@ function renderCart() {
   itemsWrap.innerHTML = ids.map(id => {
     const p = PRODUCTS.find(x => String(x.id) === String(id));
     if (!p) return "";
-    const unit = estado === "abierto" ? p.precio_abierto : p.precio;
+    const unit = p.precio;
     total += unit * cart[id];
     return `
       <div class="cart-row">
@@ -227,14 +241,6 @@ document.getElementById("cartItems").addEventListener("click", e => {
   if (btn.dataset.action === "remove") removeFromCart(id);
 });
 
-document.getElementById("estadoSellado").addEventListener("click", () => setEstado("sellado"));
-document.getElementById("estadoAbierto").addEventListener("click", () => setEstado("abierto"));
-function setEstado(v) {
-  estado = v;
-  document.getElementById("estadoSellado").classList.toggle("active", v === "sellado");
-  document.getElementById("estadoAbierto").classList.toggle("active", v === "abierto");
-  renderCart();
-}
 
 document.getElementById("clearCartBtn").addEventListener("click", () => {
   cart = {};
@@ -246,12 +252,12 @@ document.getElementById("clearCartBtn").addEventListener("click", () => {
 document.getElementById("sendWhatsappBtn").addEventListener("click", () => {
   const ids = Object.keys(cart);
   if (!ids.length) return;
-  let lines = [`Hola! Quiero consultar por estos productos (${estado === "abierto" ? "precio abierto/sin caja" : "precio sellado"}):`];
+  let lines = [`Hola! Quiero consultar por estos productos `];
   let total = 0;
   ids.forEach(id => {
     const p = PRODUCTS.find(x => String(x.id) === String(id));
     if (!p) return;
-    const unit = estado === "abierto" ? p.precio_abierto : p.precio;
+    const unit = p.precio;
     const sub = unit * cart[id];
     total += sub;
     lines.push(`• ${p.nombre} (${p.marca}) x${cart[id]} — ${CONFIG.currency}${sub}`);
@@ -290,10 +296,14 @@ function openModal(id) {
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
         </div>
-        <button class="add-btn" style="margin-top:16px" data-action="add" data-id="${p.id}">Agregar a mi lista</button>
+        ${p.disponible===false
+          ? `<button class="add-btn pedir-btn" style="margin-top:16px" data-action="pedir" data-id="${p.id}">Sin stock · Pedir por WhatsApp</button>`
+          : `<button class="add-btn" style="margin-top:16px" data-action="add" data-id="${p.id}">Agregar a mi lista</button>`}
       </div>
     </div>`;
-  modal.querySelector('[data-action="add"]').addEventListener("click", e => {
+  const pb = modal.querySelector('[data-action="pedir"]');
+  if (pb) pb.addEventListener("click", () => pedirAgotado(p.id));
+  modal.querySelector('[data-action="add"]')?.addEventListener("click", e => {
     addToCart(p.id);
     e.target.textContent = "Agregado ✓";
     e.target.classList.add("added");

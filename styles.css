@@ -733,3 +733,10 @@ body.be-admin-active .card::before {
   display: flex !important;
   z-index: 100000 !important;
 }
+
+/* Sección Agotados */
+.cat-pill.cat-agotados{border-color:#9B9B9B;color:#6E6E6E;background:#EFEDEA;}
+.cat-pill.cat-agotados.active{background:#6E6E6E;color:#fff;border-color:#6E6E6E;}
+.add-btn.pedir-btn{background:#8A8A8A;font-size:12px;}
+.add-btn.pedir-btn:hover{background:#25A244;}
+.card.agotado img{filter:grayscale(.6);opacity:.8;}
