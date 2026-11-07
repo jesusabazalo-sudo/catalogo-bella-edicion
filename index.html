@@ -42,7 +42,7 @@
       <span>Mi lista</span>
       <span class="cart-count" id="cartCount">0</span>
     </button>
-    <button id="adminQuickBtn" class="admin-quick-btn" title="Modo Admin" aria-label="Modo Admin" onclick="_LapizTripleClic()">✏️</button>
+    <button id="adminQuickBtn" class="admin-quick-btn" aria-hidden="true" tabindex="-1" onclick="_LapizTripleClic()">✏️</button>
   </div>
 
   <div class="cat-nav-wrap">
@@ -54,6 +54,11 @@
   <div class="hero-rule"></div>
   <h1>Tu rincón de belleza, a un mensaje de distancia</h1>
   <p>Perfumes, cuidado facial y corporal de Natura, Ésika, L&rsquo;Bel, Cyzone y Avon. Elige tus favoritos, arma tu lista y la confirmamos contigo por WhatsApp.</p>
+  <div class="trust">
+    <span><b>✦</b> Marcas originales</span>
+    <span><b>✦</b> Precios con descuento</span>
+    <span><b>✦</b> Pedido fácil por WhatsApp</span>
+  </div>
   <div class="hero-rule"></div>
 </section>
 
@@ -73,9 +78,18 @@
 </main>
 
 <footer class="site-footer">
-  <p>Bella Edición · Hecho con cariño para mostrar lo mejor de cada marca.</p>
-  <p class="footer-note">Precios referenciales sujetos a confirmación según stock y estado del producto.</p>
+  <div class="sf-inner">
+    <div class="sf-brand">
+      <span class="sf-name">Bella Edición</span>
+      <span class="sf-sub">Perfumería &amp; Belleza</span>
+    </div>
+    <p class="sf-brands">Natura · Ésika · L&rsquo;Bel · Cyzone · Avon</p>
+    <a class="sf-wa" href="https://wa.me/51948294214" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16.04 3C9.37 3 3.97 8.4 3.97 15.07c0 2.46.71 4.75 1.93 6.69L4 29l7.4-1.94a12.05 12.05 0 0 0 4.64.92c6.67 0 12.07-5.4 12.07-12.07C28.11 8.4 22.71 3 16.04 3z"/></svg> Escríbenos por WhatsApp</a>
+    <p class="footer-note">Precios referenciales sujetos a confirmación según stock.</p>
+  </div>
 </footer>
+
+<a class="wa-float" href="https://wa.me/51948294214?text=Hola!%20Vengo%20del%20cat%C3%A1logo%20Bella%20Edici%C3%B3n%20%E2%9C%A8" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"><svg width="26" height="26" viewBox="0 0 32 32" fill="currentColor"><path d="M16.04 3C9.37 3 3.97 8.4 3.97 15.07c0 2.46.71 4.75 1.93 6.69L4 29l7.4-1.94a12.05 12.05 0 0 0 4.64.92c6.67 0 12.07-5.4 12.07-12.07C28.11 8.4 22.71 3 16.04 3z"/></svg></a>
 
 <!-- Cart drawer -->
 <div class="overlay" id="overlay"></div>
@@ -181,6 +195,11 @@
 .ab.cfg:hover{background:rgba(201,162,75,.2);}
 .be-admin-active .card{cursor:grab;}.be-admin-active .card.sortable-chosen{outline:2px solid #C9A24B;}.be-admin-active .card.sortable-ghost{opacity:.35;}
 #btnOrdQuick{background:linear-gradient(135deg,#9B7B1A,#C9A24B)!important;color:#1E0810!important;font-weight:600;}
+.a-stats{color:#bba;font-size:11px;font-family:'Jost',sans-serif;letter-spacing:.3px;}.a-stats b{color:#E8CF8A;font-weight:600;}
+.atog-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}.atog.mini{margin:0;}
+textarea.ain{resize:vertical;min-height:70px;}
+#ap,#af{background:radial-gradient(ellipse at top,#2A0F18 0%,#0C0308 60%);}
+.ac:hover{box-shadow:0 8px 24px -10px rgba(201,162,75,.45);}
 .ab.ord{background:linear-gradient(135deg,#9B7B1A,#C9A24B);border-color:#E0C27A;color:#1E0810;font-weight:600;}
 .a-hint{color:#C9A24B;font-size:11.5px;font-family:'Jost',sans-serif;margin:0 0 10px;opacity:.85;}
 .ac.sortable-ghost{opacity:.3;}.ac.sortable-chosen{border-color:#C9A24B;box-shadow:0 0 0 2px #C9A24B;}
@@ -308,6 +327,7 @@ select.ain option{background:#2A1020;color:#fff;}
 <div id="ap">
   <div class="ah">
     <h1>✦ Admin Bella Edición</h1>
+    <span class="a-stats" id="a-stats"></span>
     <span class="a-status no" id="a-st">⚪ Sin GitHub</span>
     <button class="ab add" onclick="_Nuevo()">➕ Nuevo</button>
     <button class="ab ord ord-btn" id="a-ord" onclick="_GuardarOrden()" hidden>💾 Guardar orden</button>
@@ -346,6 +366,11 @@ select.ain option{background:#2A1020;color:#fff;}
       </div>
     </label>
 
+    <div class="atog-row">
+      <label class="atog mini"><input type="checkbox" id="f-dest"><div class="atog-lbl">⭐ Destacado</div></label>
+      <label class="atog mini"><input type="checkbox" id="f-new"><div class="atog-lbl">✨ Nuevo</div></label>
+    </div>
+
     <label class="afl">Nombre del producto</label>
     <input class="ain" id="fn" type="text" placeholder="Nombre completo...">
     <label class="afl">Marca</label>
@@ -360,6 +385,8 @@ select.ain option{background:#2A1020;color:#fff;}
     </select>
     <label class="afl">Presentación</label>
     <input class="ain" id="fp" type="text" placeholder="Ej: 50 ml, 100g...">
+    <label class="afl">Descripción (opcional)</label>
+    <textarea class="ain" id="fd" rows="3" placeholder="Aroma, beneficios, para quién es..."></textarea>
     <div class="apr">
       <div>
         <label class="afl">Precio tachado (S/)</label>
@@ -518,10 +545,11 @@ select.ain option{background:#2A1020;color:#fff;}
     });
   }
   window._initCatalogSort=initCatalogSort;
-  if(typeof renderGrid==='function'){
-    const _rg=renderGrid;
-    renderGrid=function(){ _rg.apply(this,arguments); initCatalogSort(); };
+  if(typeof window.renderGrid==='function'){
+    const _rg=window.renderGrid;
+    window.renderGrid=function(){ _rg.apply(this,arguments); initCatalogSort(); };
   }
+  document.querySelector('.brand-mark')?.addEventListener('click',()=>window._LapizTripleClic());
   new MutationObserver(()=>initCatalogSort()).observe(document.body,{attributes:true,attributeFilter:['class']});
 
   /* Clic directo en cualquier tarjeta del catálogo para editarla */
@@ -568,7 +596,13 @@ select.ain option{background:#2A1020;color:#fff;}
     return prods.filter(p=>(!q||p.nombre.toLowerCase().includes(q)||p.marca.toLowerCase().includes(q))&&(!cat||p.categoria_web===cat));
   };
 
+  function updateStats(){
+    const el=document.getElementById('a-stats'); if(!el)return;
+    const ag=prods.filter(p=>p.disponible===false).length, nu=prods.filter(p=>p.nuevo).length, de=prods.filter(p=>p.destacado).length;
+    el.innerHTML=`<b>${prods.length}</b> productos · <b>${ag}</b> agotados · <b>${nu}</b> nuevos · <b>${de}</b> destacados`;
+  }
   function renderGrid(){
+    updateStats();
     const list=filtered();
     const g=document.getElementById('agr');
     if(!list.length){g.innerHTML='<p style="color:#888;padding:30px;text-align:center;grid-column:1/-1">Sin resultados</p>';return;}
@@ -645,6 +679,9 @@ select.ain option{background:#2A1020;color:#fff;}
     }
     fcEl.value=p.categoria_web;
     document.getElementById('fp').value=p.presentacion||'';
+    document.getElementById('fd').value=p.descripcion||'';
+    document.getElementById('f-dest').checked=!!p.destacado;
+    document.getElementById('f-new').checked=!!p.nuevo;
     document.getElementById('fa').value=p.precio_antes;
     document.getElementById('fpr').value=p.precio;
     document.getElementById('aio').style.display=imgStore[id]?'block':'none';
@@ -661,7 +698,9 @@ select.ain option{background:#2A1020;color:#fff;}
     document.getElementById('aft').textContent='Nuevo producto (ID '+curId+')';
     document.getElementById('aip').src='';
     document.getElementById('f-agt').checked=false;
-    ['fn','fm','fp','fa','fpr'].forEach(id=>document.getElementById(id).value='');
+    ['fn','fm','fp','fa','fpr','fd'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-dest').checked=false;
+    document.getElementById('f-new').checked=true;
     document.getElementById('fc').value='Perfumes mujer';
     document.getElementById('aio').style.display='none';
     document.getElementById('asm').textContent='';
@@ -729,6 +768,9 @@ select.ain option{background:#2A1020;color:#fff;}
     const antes=parseFloat(document.getElementById('fa').value);
     const precio=parseFloat(document.getElementById('fpr').value);
     const agotado=document.getElementById('f-agt').checked;
+    const desc=document.getElementById('fd').value.trim();
+    const dest=document.getElementById('f-dest').checked;
+    const esNuevo=document.getElementById('f-new').checked;
 
     const msg=document.getElementById('asm');
     const btn=document.getElementById('asv');
@@ -743,8 +785,8 @@ select.ain option{background:#2A1020;color:#fff;}
         id:curId,nombre,marca,categoria_web:cat,categoria_original:cat,
         subcategoria:'',publico:'',presentacion:pres,estado_empaque:'Cerrado',
         precio_antes:isNaN(antes)?Math.round(precio*1.2):antes,precio,precio_abierto:0,
-        descripcion:'',notas:'',imagen:`images/item${curId}.jpg`,
-        disponible:!agotado,destacado:false,oferta:false,nuevo:true
+        descripcion:desc,notas:'',imagen:`images/item${curId}.jpg`,
+        disponible:!agotado,destacado:dest,oferta:false,nuevo:esNuevo
       };
       prods.push(updatedItem);
     } else {
@@ -753,6 +795,7 @@ select.ain option{background:#2A1020;color:#fff;}
       if(!isNaN(antes))p.precio_antes=antes;
       p.precio=precio;
       p.disponible=!agotado;
+      p.descripcion=desc; p.destacado=dest; p.nuevo=esNuevo;
       updatedItem=p;
     }
     modified.add(curId);

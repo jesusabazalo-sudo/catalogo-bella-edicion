@@ -22,7 +22,10 @@ fetch("products.json")
     renderCart();
   });
 
+const pctOff = p => (p.precio_antes > p.precio ? Math.round((1 - p.precio / p.precio_antes) * 100) : 0);
+
 function cardHTML(p) {
+  const off = pctOff(p);
   return `
     <div class="card" data-id="${p.id}">
       <div class="card-img-wrap" data-action="open-modal" data-id="${p.id}">
@@ -41,6 +44,7 @@ function cardHTML(p) {
         <div class="price-row">
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
+          ${off >= 5 ? `<span class="price-off">-${off}%</span>` : ""}
         </div>
         ${p.disponible===false
           ? `<button class="add-btn pedir-btn" data-action="pedir" data-id="${p.id}">Sin stock · Pedir por WhatsApp</button>`
@@ -113,6 +117,16 @@ function renderHome() {
   let reco = avail.filter(p => p.destacado || p.nuevo);
   if (reco.length < 8) reco = reco.concat(avail.filter(p => !reco.includes(p))).slice(0, 8);
   let html = rowHTML("Recomendados para ti", reco.slice(0, 16), "", "row-reco");
+  // Compra por marca
+  const brands = {};
+  avail.forEach(p => { if (p.marca && !/^(por confirmar|otros?)$/i.test(p.marca)) brands[p.marca] = (brands[p.marca] || 0) + 1; });
+  const bl = Object.entries(brands).sort((x, y) => y[1] - x[1]);
+  if (bl.length > 1) html += `<section class="brands"><h2>Compra por marca</h2><div class="brand-list">${
+    bl.map(([b, n]) => `<button class="brand-chip" data-brand="${b}"><span class="brand-ini">${b.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, "").slice(0, 2)}</span><span class="brand-nm">${b}</span><small>${n} productos</small></button>`).join("")
+  }</div></section>`;
+  // Ofertas con mayor descuento
+  const deals = avail.filter(p => pctOff(p) >= 20).sort((x, y) => pctOff(y) - pctOff(x)).slice(0, 14);
+  html += rowHTML("Ofertas imperdibles", deals, "", "row-deal");
   [...new Set(avail.map(p => p.categoria_web))].forEach(c => {
     html += rowHTML(c, avail.filter(p => p.categoria_web === c), c);
   });
@@ -125,6 +139,13 @@ function selectCategory(c) {
   document.querySelector("main").scrollIntoView({ behavior: "smooth" });
 }
 document.addEventListener("click", e => {
+  const chip = e.target.closest(".brand-chip");
+  if (chip) {
+    const inp = document.getElementById("searchInput");
+    inp.value = chip.dataset.brand; searchTerm = chip.dataset.brand;
+    renderGrid(); document.querySelector("main").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
   const more = e.target.closest(".row-more");
   if (more) { selectCategory(more.dataset.cat); return; }
   const arrow = e.target.closest(".row-arrow");
@@ -185,6 +206,7 @@ function setupCards() {
   }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
 
   cards.forEach((card, i) => {
+    if (card.closest('.row-track')) { card.classList.add('card-done'); return; }
     // Retardo en cascada: 0ms, 100ms, 200ms, 300ms, luego repite por fila
     card.style.setProperty('--cd', `${(i % 4) * 100}ms`);
     window._co.observe(card);
@@ -351,7 +373,9 @@ function openModal(id) {
         <div class="modal-price-row">
           <span class="price-before">${CONFIG.currency}${p.precio_antes}</span>
           <span class="price-now">${CONFIG.currency}${p.precio}</span>
+          ${pctOff(p) >= 5 ? `<span class="price-off">-${pctOff(p)}%</span>` : ""}
         </div>
+        ${p.precio_antes > p.precio ? `<div class="modal-save">✦ Ahorras ${CONFIG.currency}${(p.precio_antes - p.precio).toFixed(1).replace(/\.0$/, "")}</div>` : ""}
         ${p.disponible===false
           ? `<button class="add-btn pedir-btn" style="margin-top:16px" data-action="pedir" data-id="${p.id}">Sin stock · Pedir por WhatsApp</button>`
           : `<button class="add-btn" style="margin-top:16px" data-action="add" data-id="${p.id}">Agregar a mi lista</button>`}
