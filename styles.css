@@ -840,3 +840,8 @@ body.be-admin-active .wa-float{display:none;}
 @media(max-width:900px){.topbar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(251,246,241,.98)!important;}}
 /* Accesibilidad: si el usuario pide menos movimiento, todo quieto */
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;}#homeRows>section{opacity:1;transform:none;}.card-img-wrap img{opacity:1;}}
+
+/* Logo nuevo */
+.brand-mark{background:none!important;border:0!important;box-shadow:0 6px 18px -8px rgba(168,132,47,.7)!important;border-radius:50%;padding:0!important;overflow:hidden;}
+.brand-logo{display:block;width:100%;height:100%;border-radius:50%;transition:transform .5s cubic-bezier(.3,1.4,.5,1);}
+.brand:hover .brand-logo{transform:rotate(-8deg) scale(1.04);}
